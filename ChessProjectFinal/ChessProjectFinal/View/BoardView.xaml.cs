@@ -1,5 +1,4 @@
-﻿
-namespace ChessProjectFinal.View
+﻿namespace ChessProjectFinal.View
 {
     /// <summary>
     /// Interaction logic for BoardView.xaml
