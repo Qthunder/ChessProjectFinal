@@ -1,8 +1,10 @@
-﻿namespace ChessProjectFinal.Model
+﻿using System.Collections.Generic;
+
+namespace ChessProjectFinal.Model
 {
     public interface ISquare
     {
-        IPiece Occupant { get; set; }
+        PieceStruct Occupant { get; set; }
 
         bool IsOccupied { get; }
 
@@ -13,6 +15,12 @@
         System.Windows.Point Coords { get; }
 
         bool IsValidMove { get; set; }
+
+        ISet<ISquare> MoveSquares { get; set; }
+
+        bool IsMoveable { get; }
+
+        bool IsActive { get; set; }
 
     }
 }

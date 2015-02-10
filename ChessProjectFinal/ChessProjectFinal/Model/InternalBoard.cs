@@ -15,7 +15,7 @@ namespace ChessProjectFinal.Model
         private Point enPassantSquare ;
         private Dictionary<Player, Boolean> castleQueenSide=new Dictionary<Player, bool>();
         private Dictionary<Player, Boolean> castleKingSide=new Dictionary<Player, bool>();
-        private Stack<BoardState> History=new Stack<BoardState>();
+        private readonly Stack<BoardState> history=new Stack<BoardState>();
         #endregion
         #region Constructor
         public InternalBoard()
@@ -26,7 +26,7 @@ namespace ChessProjectFinal.Model
         #region PUBLIC METHODS
         public void DoMove(IMove move)
         {
-            History.Push(this.GetState());
+            this.history.Push(this.GetState());
             var x = (int)move.From.X;
             var y = (int)move.From.Y;
             var x2 = (int)move.To.X;
@@ -67,7 +67,7 @@ namespace ChessProjectFinal.Model
         }
         public void UndoMove()
         {
-            this.RestoreState(History.Pop());
+            this.RestoreState(this.history.Pop());
         } 
         public BoardState GetState()
         {
@@ -79,7 +79,7 @@ namespace ChessProjectFinal.Model
             var validmoves = moves.GetRange(0, moves.Count);
             foreach (var move in moves)
             {
-                if (move.IsKingSideCastle && !this.isCheck(player))
+                if (move.IsKingSideCastle  )
                 {
                     var castle = true;
                     for (var i = 5; i < 7; i++)
@@ -88,7 +88,7 @@ namespace ChessProjectFinal.Model
                     if (!castle)
                         validmoves.Remove(move);
                 }
-                if (move.IsQueenSideCastle && !this.isCheck(player))
+                if (move.IsQueenSideCastle )
                 {   //check for check
                     var castle = true;
                     for (var i = 1; i < 4; i++)
@@ -111,8 +111,16 @@ namespace ChessProjectFinal.Model
             pieceBoard =(PieceStruct[,]) boardState.PieceBoard.Clone();
             enPassant = boardState.EnPassant;
             enPassantSquare = boardState.EnPassantSquare;
-            castleKingSide = boardState.CastleKingSide;
-            castleQueenSide = boardState.CastleQueenSide;
+            castleKingSide = new Dictionary<Player, bool>
+            {
+                {Player.White, boardState.CastleKingSide[Player.White]},
+                {Player.Black, boardState.CastleKingSide[Player.Black]}
+            };
+            castleQueenSide = new Dictionary<Player, bool>
+            {
+                {Player.White, boardState.CastleQueenSide[Player.White]},
+                {Player.Black, boardState.CastleQueenSide[Player.Black]}
+            };
 
         }
         #endregion
@@ -141,7 +149,7 @@ namespace ChessProjectFinal.Model
           castleQueenSide.Add(Player.Black, true);
           castleKingSide.Add(Player.White, true);
           castleKingSide.Add(Player.Black, true);
-            History.Clear();
+            this.history.Clear();
         }
         private List<Move> getMoves(Player player)
          {

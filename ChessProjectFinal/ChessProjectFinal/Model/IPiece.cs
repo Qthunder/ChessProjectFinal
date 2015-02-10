@@ -5,9 +5,10 @@ namespace ChessProjectFinal.Model
 {
     public interface IPiece
     {
-        PieceStruct PieceStruct { get; set; } 
+        
        
         ISquare Location { get; set; }
+        PieceStruct PieceStruct { get; set; }
 
         ISet<ISquare> MoveSquares { get; set; }
 

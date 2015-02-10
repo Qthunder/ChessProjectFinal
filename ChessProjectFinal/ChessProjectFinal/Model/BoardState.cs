@@ -17,8 +17,16 @@ namespace ChessProjectFinal.Model
             PieceBoard = (PieceStruct[,])pieceBoard.Clone();
             EnPassant = enPassant;
             EnPassantSquare = enPassantSquare;
-            CastleKingSide = castleKingSide;
-            CastleQueenSide = castleQueenSide;
+            CastleKingSide = new Dictionary<Player, bool>
+            {
+                {Player.White, castleKingSide[Player.White]},
+                {Player.Black, castleKingSide[Player.Black]}
+            };
+            CastleQueenSide = new Dictionary<Player, bool>
+            {
+                {Player.White, castleQueenSide[Player.White]},
+                {Player.Black, castleQueenSide[Player.Black]}
+            };
         }
     }
 }

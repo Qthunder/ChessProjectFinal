@@ -5,24 +5,14 @@ namespace ChessProjectFinal.Model
 {
     public class Piece : BasePropertyChanged,IPiece
     {
-        private PieceStruct pieceStruct;
+        
 
         private ISquare location;
+        private PieceStruct pieceStruct;
 
         private ISet<ISquare> moveSquares = new HashSet<ISquare>();
 
         private bool isActive;
-
-        public PieceStruct PieceStruct
-        {
-            get { return pieceStruct; }
-            set
-            {
-                pieceStruct = value;
-                this.RaisePropertyChanged(()=>PieceStruct);
-            }
-        }
-
         public ISquare Location
         {
             get
@@ -34,6 +24,18 @@ namespace ChessProjectFinal.Model
                 location = value;
             }
         }
+
+        public PieceStruct PieceStruct
+        {
+            get { return pieceStruct; }
+            set
+            {
+                pieceStruct = value;
+                this.RaisePropertyChanged(()=>PieceStruct);
+            }
+        }
+
+        
 
         public ISet<ISquare> MoveSquares {
             get { return moveSquares; }

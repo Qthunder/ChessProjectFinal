@@ -59,20 +59,25 @@
                             <Button HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Command="{Binding DataContext.MakeMoveCommand, RelativeSource={RelativeSource  AncestorType=view:BoardView}}" CommandParameter="{Binding}" >
                                 <Button.Template>
                                     <ControlTemplate>
-                                        <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="#a0192f" Visibility="{Binding IsValidMove,Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                        <Grid>        
+                                            <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Fill="#a0192f" Visibility="{Binding IsValidMove,Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                        </Grid>
                                     </ControlTemplate>
                                 </Button.Template>
                             </Button>
-                            <Button HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Command="{Binding DataContext.ActivatePieceCommand, RelativeSource={RelativeSource AncestorType=view:BoardView}}" CommandParameter="{Binding Occupant}" Visibility="{Binding Occupant, Converter={StaticResource HideOnNullConverter}}" >
+                            <Button HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Command="{Binding DataContext.ActivatePieceCommand, RelativeSource={RelativeSource AncestorType=view:BoardView}}" CommandParameter="{Binding }" Visibility="{Binding Occupant, Converter={StaticResource HideOnNullConverter}}" >
                                 <Button.Template>
                                     <ControlTemplate>
                                         <Grid>
-                                            <Ellipse HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  IsHitTestVisible="{Binding IsValidMove,Converter={StaticResource InvertBooleanConverter} }" Fill="{Binding Occupant.PieceStruct.Color, Converter={StaticResource PlayerToColorConverter}}" >
+                                            <Image Source="{Binding Occupant ,Converter={StaticResource PieceToDisplayConverter}}"  IsHitTestVisible="{Binding IsValidMove,Converter={StaticResource InvertBooleanConverter} }"></Image>
+                                            <!--<Ellipse HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  IsHitTestVisible="{Binding IsValidMove,Converter={StaticResource InvertBooleanConverter} }" Fill="{Binding Occupant.Color, Converter={StaticResource PlayerToColorConverter}}" >
                                                 <Ellipse.Effect>
                                                     <DropShadowEffect Opacity=".5" ShadowDepth="3" />
                                                 </Ellipse.Effect>
-                                            </Ellipse>
-                                            <TextBlock Text="{Binding Occupant.PieceStruct.Piece, Converter={StaticResource PieceToDisplayConverter}}" FontSize="17" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="ExtraBold"></TextBlock>
+                                            </Ellipse>-->
+<!--
+                                            <TextBlock Text="{Binding Occupant.Piece, Converter={StaticResource PieceToDisplayConverter}}" FontSize="17" VerticalAlignment="Center" HorizontalAlignment="Center" FontWeight="ExtraBold"></TextBlock>
+-->
                                         </Grid>
                                     </ControlTemplate>
                                 </Button.Template>

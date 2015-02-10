@@ -10,18 +10,18 @@ namespace ChessProjectFinal.Model
 
         #region PRIVATE BACKING FIELDS
 
-        private ObservableCollection<IPiece> pieces;
+        private ObservableCollection<PieceStruct> pieces;
 
         private ObservableCollection<ISquare> squares;
 
         private Dictionary<Point, ISquare> indexedSquares;
 
-        private IPiece selectedPiece;
+        private ISquare selectedSquare;
 
         #endregion
 
         #region PROPERTIES
-        public ObservableCollection<IPiece> Pieces
+        public ObservableCollection<PieceStruct> Pieces
         {
             get
             {
@@ -48,18 +48,18 @@ namespace ChessProjectFinal.Model
                 RaisePropertyChanged(() => Squares);
             }
         }
-        public IPiece SelectedPiece
+        public ISquare SelectedSquare
         {
             get
             {
-                return selectedPiece;
+                return selectedSquare;
             }
             set
             {
-                selectedPiece = value;
-                RaisePropertyChanged(() => SelectedPiece);
-                if (SelectedPiece != null)
-                    SetValidMoves(SelectedPiece);
+                selectedSquare= value;
+                RaisePropertyChanged(() => SelectedSquare);
+                if (SelectedSquare != null)
+                    SetValidMoves(SelectedSquare);
                 else
                     ResetValidMoves();
             }
@@ -80,7 +80,7 @@ namespace ChessProjectFinal.Model
         #endregion
 
         #region METHODS
-        public void MakeMove(IPiece piece, ISquare targetSquare)
+        public void MakeMove(ISquare fromSquare, ISquare targetSquare)
         {
 
             if (targetSquare.IsOccupied)
@@ -88,21 +88,19 @@ namespace ChessProjectFinal.Model
                 var capturedPiece = targetSquare.Occupant;
                 Pieces.Remove(capturedPiece); 
             }
-            piece.Location.Occupant = null; 
-            targetSquare.Occupant = piece;
-            piece.Location = targetSquare;
-
+            targetSquare.Occupant = fromSquare.Occupant;
+            fromSquare.Occupant = null;
             ResetValidMoves();
 
             RaisePropertyChanged(() => Pieces);
 
 
         }
-        public void SetValidMoves(IPiece currentSelectedPiece)
+        public void SetValidMoves(ISquare currentSelectedSquare)
         {
             ResetValidMoves();
 
-            foreach (ISquare square in currentSelectedPiece.MoveSquares)
+            foreach (var square in currentSelectedSquare.MoveSquares)
             {
                 square.IsValidMove = true;
             }
@@ -119,7 +117,7 @@ namespace ChessProjectFinal.Model
         public void Initialize()
         {
             Squares = new ObservableCollection<ISquare>();
-            Pieces = new ObservableCollection<IPiece>();
+            Pieces = new ObservableCollection<PieceStruct>();
             IndexedSquares = new Dictionary<Point, ISquare>();
             for (int i = 0; i < Game.BOARD_SIZE; i++)
                 for (int j = 0; j < Game.BOARD_SIZE; j++)

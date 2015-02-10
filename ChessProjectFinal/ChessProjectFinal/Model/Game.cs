@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using System.Windows;
+﻿using System.Windows;
 using ChessProjectFinal.Common;
 using ChessProjectFinal.ViewModel;
 
@@ -82,7 +81,7 @@ namespace ChessProjectFinal.Model
         }
         public void MovePiece(ISquare targetSquare)
         {
-            var move = CreateMove(Board.SelectedPiece, targetSquare);
+            var move = CreateMove(Board.SelectedSquare, targetSquare);
             InternalBoard.DoMove(move);
             SwapPlayer();
             ReSync();
@@ -131,34 +130,34 @@ namespace ChessProjectFinal.Model
             Board.Pieces.Clear();
             foreach (var square in Board.Squares)
             {
-                square.Occupant = new Piece(state.PieceBoard[square.Row, square.Column], square);
+                square.Occupant = state.PieceBoard[square.Row, square.Column];
+                square.MoveSquares.Clear();
                 Board.Pieces.Add(square.Occupant); 
             }
             foreach (var move in moves)
             {
-                Board.IndexedSquares[move.From].Occupant.MoveSquares.Add(Board.IndexedSquares[move.To]);
-                //TODO promotions
-                
+                Board.IndexedSquares[move.From].MoveSquares.Add(Board.IndexedSquares[move.To]);
             }
         }
 
-        private Move CreateMove(IPiece piece, ISquare targetSquare)
+        private Move CreateMove(ISquare fromSquare, ISquare targetSquare)
         {
-            var capturedPiece = (targetSquare.Occupant == null) ? null : targetSquare.Occupant.PieceStruct;
-            if (piece.PieceStruct.Piece == PieceType.Pawn &&
-                targetSquare.Row == BASE_ROW(OTHER_PLAYER(piece.PieceStruct.Color)))
+            var capturedPiece = targetSquare.Occupant;
+            var piece = fromSquare.Occupant;
+            if (piece.Piece == PieceType.Pawn &&
+                targetSquare.Row == BASE_ROW(OTHER_PLAYER(piece.Color)))
             {
                 var promotionPiece = PromoteDialog();
-                return new Move(piece.Location.Coords,targetSquare.Coords,piece.PieceStruct,capturedPiece){Promotion = promotionPiece};
+                return new Move(fromSquare.Coords,targetSquare.Coords,piece,capturedPiece){Promotion = promotionPiece};
             }
-            if (piece.PieceStruct.Piece == PieceType.Pawn && piece.Location.Column != targetSquare.Column &&  (targetSquare.Occupant==null || targetSquare.Occupant.PieceStruct == null )) 
-                return new Move(piece.Location.Coords,targetSquare.Coords,piece.PieceStruct, Board.IndexedSquares[new Point(targetSquare.Column,piece.Location.Row)].Occupant.PieceStruct){IsEnPassant = true};
-            if (piece.PieceStruct.Piece==PieceType.King && piece.Location.Column+2==targetSquare.Column)
-                return new Move(piece.Location.Coords,targetSquare.Coords,piece.PieceStruct,null){IsKingSideCastle = true};
-            if (piece.PieceStruct.Piece == PieceType.King && piece.Location.Column - 2 == targetSquare.Column)
-                return new Move(piece.Location.Coords, targetSquare.Coords, piece.PieceStruct, null) { IsQueenSideCastle = true };
+            if (piece.Piece == PieceType.Pawn && fromSquare.Column != targetSquare.Column &&  targetSquare.Occupant==null ) 
+                return new Move(fromSquare.Coords,targetSquare.Coords,piece, Board.IndexedSquares[new Point(targetSquare.Column,fromSquare.Row)].Occupant){IsEnPassant = true};
+            if (piece.Piece==PieceType.King && fromSquare.Column+2==targetSquare.Column)
+                return new Move(fromSquare.Coords,targetSquare.Coords,piece,null){IsKingSideCastle = true};
+            if (piece.Piece == PieceType.King &&fromSquare.Column - 2 == targetSquare.Column)
+                return new Move(fromSquare.Coords, targetSquare.Coords, piece, null) { IsQueenSideCastle = true };
 
-            return new Move(piece.Location.Coords, targetSquare.Coords, piece.PieceStruct, capturedPiece);
+            return new Move(fromSquare.Coords, targetSquare.Coords, piece, capturedPiece);
         }
 
         private PieceStruct PromoteDialog()
@@ -174,7 +173,7 @@ namespace ChessProjectFinal.Model
         private void SwapPlayer()
         {
             CurrentPlayer = OTHER_PLAYER(CurrentPlayer);
-            Board.SelectedPiece = null;
+            Board.SelectedSquare = null;
             CheckAI();
         }
 

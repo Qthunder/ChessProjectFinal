@@ -17,16 +17,16 @@ namespace ChessProjectFinal.ViewModel
             }
         }
 
-        private DelegateCommand<Piece> activatePieceCommand;
+        private DelegateCommand<Square> activatePieceCommand;
 
         private DelegateCommand<Square> makeMoveCommand;
 
-        public DelegateCommand<Piece> ActivatePieceCommand
+        public DelegateCommand<Square> ActivatePieceCommand
         {
             get
             {
                 if (this.activatePieceCommand == null)
-                    this.activatePieceCommand = new DelegateCommand<Piece>(ActivatePiece);
+                    this.activatePieceCommand = new DelegateCommand<Square>(ActivatePiece);
                 return activatePieceCommand;
             }
         }
@@ -41,19 +41,19 @@ namespace ChessProjectFinal.ViewModel
             }
         }
 
-        public void ActivatePiece(Piece targetPiece)
+        public void ActivatePiece(ISquare targetSquare)
         {
             if (!this.Game.IsActive) return;
-            if (targetPiece.IsMoveable && !targetPiece.IsActive)
+            if (targetSquare.IsMoveable && !targetSquare.IsActive)
             {
-                targetPiece.IsActive = true;
-                this.Game.Board.SelectedPiece = targetPiece;
+                targetSquare.IsActive = true;
+                this.Game.Board.SelectedSquare = targetSquare;
             }
             else
             {
-                if (!targetPiece.IsMoveable) return;
-                targetPiece.IsActive = false;
-                this.Game.Board.SelectedPiece = null;
+                if (!targetSquare.IsMoveable) return;
+                targetSquare.IsActive = false;
+                this.Game.Board.SelectedSquare = null;
             }
         }
        

@@ -1,15 +1,21 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Windows;
 using ChessProjectFinal.Common;
 
 namespace ChessProjectFinal.Model
 {
     public class Square :BasePropertyChanged, ISquare
     {
-        private IPiece occupant;
+
+        #region PRIVATE BACKING FIELDS
         private int row;
         private int col;
         private bool isValidMove;
-
+        private PieceStruct pieceStruct;
+        private ISet<ISquare> moveSquares = new HashSet<ISquare>();
+        private bool isActive;
+        #endregion
+        #region CONSTRUCTORS
         public Square()
         {
         }
@@ -18,20 +24,8 @@ namespace ChessProjectFinal.Model
             Row = row;
             Column = column;
         }
-        public IPiece Occupant
-        {
-            get
-            {
-                return this.occupant;
-            }
-            set
-            {
-                occupant = value;
-                RaisePropertyChanged(() => Occupant);
-
-            }
-        }
-
+        #endregion
+        #region PROPERTIES
         public bool IsOccupied
         {
             get
@@ -39,7 +33,6 @@ namespace ChessProjectFinal.Model
                 return (Occupant != null);
             }
         }
-
         public int Row
         {
             get
@@ -53,7 +46,6 @@ namespace ChessProjectFinal.Model
                 RaisePropertyChanged(() => Coords);
             }
         }
-
         public int Column
         {
             get
@@ -67,12 +59,49 @@ namespace ChessProjectFinal.Model
                 RaisePropertyChanged(() => Coords);
             }
         }
-
         public Point Coords
         {
             get { return new Point(Row, Column); }
         }
+        public PieceStruct Occupant
+        {
+            get { return pieceStruct; }
+            set
+            {
+                pieceStruct = value;
+                this.RaisePropertyChanged(() => Occupant);
+            }
+        }
+        
 
+
+        public ISet<ISquare> MoveSquares
+        {
+            get { return moveSquares; }
+            set { moveSquares = value; }
+        }
+
+        public bool IsActive
+        {
+            get
+            {
+                return this.isActive;
+            }
+
+            set
+            {
+                if (value != isActive)
+                {
+                    isActive = value;
+                    RaisePropertyChanged(() => IsActive);
+                }
+            }
+        }
+
+        public bool IsMoveable
+        {
+            get { return MoveSquares.Count > 0; }
+        }
 
         public bool IsValidMove
         {
@@ -86,5 +115,6 @@ namespace ChessProjectFinal.Model
                 RaisePropertyChanged(() => IsValidMove);
             }
         }
+        #endregion
     }
 }
