@@ -12,14 +12,7 @@ namespace ChessProjectFinal.Model
 
         Dictionary<Point, ISquare> IndexedSquares { get; set; }
 
-        IPiece WhiteKing { get; set; }
-
-        IPiece BlackKing { get; set; }
-
-        Dictionary<Player, IPiece> Kings { get; }
-
         void Initialize();
 
-        void InitSquares();
     }
 }
