@@ -54,7 +54,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Common\DelegateCommand.cs" />
-    <Compile Include="Common\RelayCommand.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Converters\HideOnNullConverter.cs" />
     <Compile Include="Converters\InvertBooleanConverter.cs" />
@@ -62,7 +61,6 @@
     <Compile Include="Converters\PlayerToColorConverter.cs" />
     <Compile Include="Converters\PointToColorConverter.cs" />
     <Compile Include="Model\Board.cs" />
-    <Compile Include="Model\BoardState.cs" />
     <Compile Include="Model\Game.cs" />
     <Compile Include="Model\IBoard.cs" />
     <Compile Include="Model\IInternalBoard.cs" />
@@ -78,12 +76,8 @@
     <Compile Include="Model\Square.cs" />
     <Compile Include="ViewModel\BoardViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
-    <Compile Include="ViewModel\PromotionViewModel.cs" />
     <Compile Include="View\BoardView.xaml.cs">
       <DependentUpon>BoardView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="View\PromotionView.xaml.cs">
-      <DependentUpon>PromotionView.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -100,10 +94,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="View\BoardView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\PromotionView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -135,9 +125,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Service\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
