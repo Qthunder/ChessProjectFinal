@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Windows;
 using ChessProjectFinal.Common;
 using ChessProjectFinal.ViewModel;
 
@@ -33,17 +34,15 @@ namespace ChessProjectFinal.Model
         }
         #endregion
         #region PRIVATE BACKING FIELDS
-        private PlayerType whitePlayer;
-        private PlayerType blackPlayer;
         private Board board;
         private IInternalBoard internalBoard;
         private Player currentPlayer;
         private bool isActive;
         private bool isBusy;
+        private Dictionary<Player,PlayerType> playerTypes=new Dictionary<Player,PlayerType>();  
         #endregion
 
         #region PROPERTIES 
-  
         public Player CurrentPlayer
         {
             get { return currentPlayer; }
@@ -54,7 +53,6 @@ namespace ChessProjectFinal.Model
 
             }
         }
-
         public IInternalBoard InternalBoard
         {
             get { return internalBoard; }
@@ -85,8 +83,11 @@ namespace ChessProjectFinal.Model
             InternalBoard.DoMove(move);
             SwapPlayer();
             ReSync();
+            CheckAI();
+
           
         }
+       
         public void Restart()
         {
             Board = new Board();
@@ -101,28 +102,29 @@ namespace ChessProjectFinal.Model
 
         public PlayerType WhitePlayer
         {
-            get { return whitePlayer; }
+            get { return playerTypes[Player.White]; }
 
             set
             {
-                whitePlayer = value;
+                playerTypes.Add(Player.White, value);
                 RaisePropertyChanged(() => WhitePlayer);
             }
         }
 
         public PlayerType BlackPlayer
         {
-            get { return blackPlayer; }
+            get { return playerTypes[Player.Black]; }
 
             set
             {
-                blackPlayer = value;
+                playerTypes[Player.Black] = value;
                 RaisePropertyChanged(() => BlackPlayer);
             }
         }
 
         #endregion
         #region PRIVATE METHODS
+        
         private void ReSync()
         {
             var moves = InternalBoard.GetValidMoves(CurrentPlayer);
@@ -144,23 +146,23 @@ namespace ChessProjectFinal.Model
         {
             var capturedPiece = targetSquare.Occupant;
             var piece = fromSquare.Occupant;
-            if (piece.Piece == PieceType.Pawn &&
-                targetSquare.Row == BASE_ROW(OTHER_PLAYER(piece.Color)))
+            if (piece.PieceType == PieceType.Pawn &&
+                targetSquare.Row == BASE_ROW(OTHER_PLAYER(piece.Player)))
             {
                 var promotionPiece = PromoteDialog();
                 return new Move(fromSquare.Coords,targetSquare.Coords,piece,capturedPiece){Promotion = promotionPiece};
             }
-            if (piece.Piece == PieceType.Pawn && fromSquare.Column != targetSquare.Column &&  targetSquare.Occupant==null ) 
+            if (piece.PieceType == PieceType.Pawn && fromSquare.Column != targetSquare.Column &&  targetSquare.Occupant==null ) 
                 return new Move(fromSquare.Coords,targetSquare.Coords,piece, Board.IndexedSquares[new Point(targetSquare.Column,fromSquare.Row)].Occupant){IsEnPassant = true};
-            if (piece.Piece==PieceType.King && fromSquare.Column+2==targetSquare.Column)
+            if (piece.PieceType==PieceType.King && fromSquare.Column+2==targetSquare.Column)
                 return new Move(fromSquare.Coords,targetSquare.Coords,piece,null){IsKingSideCastle = true};
-            if (piece.Piece == PieceType.King &&fromSquare.Column - 2 == targetSquare.Column)
+            if (piece.PieceType == PieceType.King &&fromSquare.Column - 2 == targetSquare.Column)
                 return new Move(fromSquare.Coords, targetSquare.Coords, piece, null) { IsQueenSideCastle = true };
 
             return new Move(fromSquare.Coords, targetSquare.Coords, piece, capturedPiece);
         }
 
-        private PieceStruct PromoteDialog()
+        private Piece PromoteDialog()
         {
             var viewModel = new PromotionViewModel(CurrentPlayer);
             return viewModel.PieceStruct;
@@ -174,12 +176,12 @@ namespace ChessProjectFinal.Model
         {
             CurrentPlayer = OTHER_PLAYER(CurrentPlayer);
             Board.SelectedSquare = null;
-            CheckAI();
         }
-
+        
         private void CheckAI()
         {
-            //TODO
+            if (playerTypes[CurrentPlayer] == PlayerType.AI)
+                return;
         }
 #endregion
 

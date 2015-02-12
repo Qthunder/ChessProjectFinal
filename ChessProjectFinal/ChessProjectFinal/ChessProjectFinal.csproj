@@ -53,6 +53,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ChessSearch\AIMove.cs" />
+    <Compile Include="ChessSearch\AIState.cs" />
+    <Compile Include="ChessSearch\BasicHeuristic.cs" />
     <Compile Include="Common\DelegateCommand.cs" />
     <Compile Include="Common\RelayCommand.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />
@@ -68,14 +71,19 @@
     <Compile Include="Model\IInternalBoard.cs" />
     <Compile Include="Model\IMove.cs" />
     <Compile Include="Model\InternalBoard.cs" />
-    <Compile Include="Model\IPiece.cs" />
     <Compile Include="Model\ISquare.cs" />
     <Compile Include="Model\Move.cs" />
     <Compile Include="Model\Piece.cs" />
-    <Compile Include="Model\PieceStruct.cs" />
     <Compile Include="Model\PieceType.cs" />
     <Compile Include="Model\Player.cs" />
     <Compile Include="Model\Square.cs" />
+    <Compile Include="Search\IAction.cs" />
+    <Compile Include="Search\IHeuristic.cs" />
+    <Compile Include="Search\IOrdering.cs" />
+    <Compile Include="Search\IState.cs" />
+    <Compile Include="Search\Node.cs" />
+    <Compile Include="Search\NegaMaxSearch.cs" />
+    <Compile Include="Search\ISearch.cs" />
     <Compile Include="ViewModel\BoardViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\PromotionViewModel.cs" />
@@ -135,9 +143,7 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Service\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

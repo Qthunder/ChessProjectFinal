@@ -7,14 +7,14 @@ namespace ChessProjectFinal.Model
         public bool IsEnPassant { get; set; } 
         public bool IsKingSideCastle { get; set; }
         public bool IsQueenSideCastle { get; set; }
-        public PieceStruct Piece { get; set; }
-        public PieceStruct CapturedPiece { get; set; }
-        public PieceStruct Promotion { get; set; }
+        public Piece Piece { get; set; }
+        public Piece CapturedPiece { get; set; }
+        public Piece Promotion { get; set; }
         public Point From { get; set; }
         public Point To { get; set; }
 
         public Move() { }
-        public Move(Point from, Point to, PieceStruct piece,PieceStruct capturedPiece)
+        public Move(Point from, Point to, Piece piece,Piece capturedPiece)
         {
             From = from;
             To = to;

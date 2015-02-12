@@ -1,4 +1,5 @@
-﻿using ChessProjectFinal.Common;
+﻿using System.Windows.Input;
+using ChessProjectFinal.Common;
 using ChessProjectFinal.Model;
 
 namespace ChessProjectFinal.ViewModel
@@ -20,6 +21,7 @@ namespace ChessProjectFinal.ViewModel
         private DelegateCommand<Square> activatePieceCommand;
 
         private DelegateCommand<Square> makeMoveCommand;
+        private ICommand restartCommand;
 
         public DelegateCommand<Square> ActivatePieceCommand
         {
@@ -41,6 +43,21 @@ namespace ChessProjectFinal.ViewModel
             }
         }
 
+        public ICommand RestartCommand
+        {
+            
+            get
+            {
+                if (restartCommand==null)
+                    restartCommand=new RelayCommand(this.restart);
+                return restartCommand;
+            }
+        }
+
+        private void restart(object obj)
+        {
+            this.RestartGame();
+        }
         public void ActivatePiece(ISquare targetSquare)
         {
             if (!this.Game.IsActive) return;
@@ -61,6 +78,8 @@ namespace ChessProjectFinal.ViewModel
         {
             Game.Restart();
         }
+        
+
 
         public void MakeMove(Square targetSquare)
         {

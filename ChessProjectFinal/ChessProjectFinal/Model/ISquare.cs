@@ -4,7 +4,7 @@ namespace ChessProjectFinal.Model
 {
     public interface ISquare
     {
-        PieceStruct Occupant { get; set; }
+        Piece Occupant { get; set; }
 
         bool IsOccupied { get; }
 

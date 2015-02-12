@@ -6,7 +6,7 @@ namespace ChessProjectFinal.Model
 {
     public interface IBoard
     {
-        ObservableCollection<PieceStruct> Pieces { get; set; }
+        ObservableCollection<Piece> Pieces { get; set; }
 
         ObservableCollection<ISquare> Squares { get; set; }
 

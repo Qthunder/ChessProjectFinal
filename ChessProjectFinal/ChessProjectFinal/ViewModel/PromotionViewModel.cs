@@ -8,9 +8,9 @@ namespace ChessProjectFinal.ViewModel
     {
         public Action CloseAction { get; set; }
 
-        private PieceStruct pieceStruct;
+        private Piece pieceStruct;
         private readonly Player player;
-        public PieceStruct PieceStruct
+        public Piece PieceStruct
         {
             get
             {
@@ -73,22 +73,22 @@ namespace ChessProjectFinal.ViewModel
 
         public void BishopPick(object context)
         {
-            PieceStruct=new PieceStruct {Color = player,Piece = PieceType.Bishop};
+            PieceStruct = Piece.PIECES[player][PieceType.Bishop];
             CloseAction();
         }
         public void KnightPick(object context)
         {
-            PieceStruct = new PieceStruct { Color = player, Piece = PieceType.Knight};
+            PieceStruct = Piece.PIECES[player][PieceType.Knight];
             CloseAction();
         }
         public void RookPick(object context)
         {
-            PieceStruct = new PieceStruct { Color = player, Piece = PieceType.Rook };
+            PieceStruct = Piece.PIECES[player][PieceType.Rook];
             CloseAction();
         }
         public void QueenPick(object context)
         {
-            PieceStruct = new PieceStruct { Color = player, Piece = PieceType.Queen};
+            PieceStruct = Piece.PIECES[player][PieceType.Queen];
             CloseAction();
         }
 

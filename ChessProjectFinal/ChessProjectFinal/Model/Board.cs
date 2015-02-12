@@ -10,7 +10,7 @@ namespace ChessProjectFinal.Model
 
         #region PRIVATE BACKING FIELDS
 
-        private ObservableCollection<PieceStruct> pieces;
+        private ObservableCollection<Piece> pieces;
 
         private ObservableCollection<ISquare> squares;
 
@@ -21,7 +21,7 @@ namespace ChessProjectFinal.Model
         #endregion
 
         #region PROPERTIES
-        public ObservableCollection<PieceStruct> Pieces
+        public ObservableCollection<Piece> Pieces
         {
             get
             {
@@ -117,7 +117,7 @@ namespace ChessProjectFinal.Model
         public void Initialize()
         {
             Squares = new ObservableCollection<ISquare>();
-            Pieces = new ObservableCollection<PieceStruct>();
+            Pieces = new ObservableCollection<Piece>();
             IndexedSquares = new Dictionary<Point, ISquare>();
             for (int i = 0; i < Game.BOARD_SIZE; i++)
                 for (int j = 0; j < Game.BOARD_SIZE; j++)

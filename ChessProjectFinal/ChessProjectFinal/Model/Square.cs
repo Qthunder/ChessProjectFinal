@@ -11,7 +11,7 @@ namespace ChessProjectFinal.Model
         private int row;
         private int col;
         private bool isValidMove;
-        private PieceStruct pieceStruct;
+        private Piece pieceStruct;
         private ISet<ISquare> moveSquares = new HashSet<ISquare>();
         private bool isActive;
         #endregion
@@ -63,7 +63,7 @@ namespace ChessProjectFinal.Model
         {
             get { return new Point(Row, Column); }
         }
-        public PieceStruct Occupant
+        public Piece Occupant
         {
             get { return pieceStruct; }
             set

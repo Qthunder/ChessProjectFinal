@@ -23,10 +23,10 @@ namespace ChessProjectFinal.Converters
 
         public object Convert(object value, System.Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            var piece = (PieceStruct)value;
+            var piece = (Piece)value;
             if (piece == null)
                 return null;
-            var source = "http://www.wpclipart.com/recreation/games/chess/chess_set_1/chess_piece_" +PIECE_COLOR[piece.Color] + "_" + PIECE_TYPE[piece.Piece] + "_T.png";
+            var source = "http://www.wpclipart.com/recreation/games/chess/chess_set_1/chess_piece_" +PIECE_COLOR[piece.Player] + "_" + PIECE_TYPE[piece.PieceType] + "_T.png";
             return source;
 
         }
