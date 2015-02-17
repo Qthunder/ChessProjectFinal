@@ -6,24 +6,25 @@ using System.Windows;
 namespace ChessProjectFinal.Model
 {
 
-    public class InternalBoard :IInternalBoard
+    public class GameHistory :IInternalBoard
     {
 
         #region STATE
+        private readonly Stack<BoardState> history=new Stack<BoardState>();
         private Piece[,] pieceBoard=new Piece[8,8];
         private bool enPassant;
         private Point enPassantSquare ;
         private Dictionary<Player, Boolean> castleQueenSide=new Dictionary<Player, bool>();
         private Dictionary<Player, Boolean> castleKingSide=new Dictionary<Player, bool>();
-        private readonly Stack<BoardState> history=new Stack<BoardState>();
+        private Player currentPlayer = Player.White; 
         #endregion
         #region CONSTRUCTORS
-        public InternalBoard()
+        public GameHistory()
         {
             restart();
         }
 
-        public InternalBoard(BoardState boardState)
+        public GameHistory(BoardState boardState)
         {
             RestoreState(boardState);
             this.history.Clear();
@@ -32,6 +33,14 @@ namespace ChessProjectFinal.Model
         #region PUBLIC METHODS
         public void DoMove(IMove move)
         {
+            currentPlayer = Game.OTHER_PLAYER(currentPlayer);
+            this.doMove(move);
+
+        }
+
+        private void doMove(IMove move)
+        {
+            
             this.history.Push(this.GetState());
             var x = (int)move.From.X;
             var y = (int)move.From.Y;
@@ -68,18 +77,19 @@ namespace ChessProjectFinal.Model
                 pieceBoard[baseRow, 0] = null;
                 pieceBoard[baseRow, 3] = Piece.PIECES[move.Piece.Player][PieceType.Rook];
             }
-
-
         }
+
+
         public void UndoMove()
         {
-            this.RestoreState(this.history.Pop());
+
+           RestoreState(history.Pop());
         } 
         public BoardState GetState()
         {
-            return new BoardState(pieceBoard,enPassant,enPassantSquare,castleQueenSide,castleKingSide);
+            return new BoardState(pieceBoard,enPassant,enPassantSquare,castleQueenSide,castleKingSide,currentPlayer);
         }
-        public List<Move> GetValidMoves(Player player)
+        public IReadOnlyList<Move> GetValidMoves(Player player)
         {
             var moves = this.getMoves(player);
             var validmoves = moves.GetRange(0, moves.Count);
@@ -103,10 +113,10 @@ namespace ChessProjectFinal.Model
                     if (!castle)
                         validmoves.Remove(move);
                 }
-                this.DoMove(move);
-                if (this.isCheck(player))
+                doMove(move);
+                if (isCheck(player))
                     validmoves.Remove(move);
-                this.UndoMove();
+               UndoMove();
 
             }
             return validmoves;
@@ -133,6 +143,7 @@ namespace ChessProjectFinal.Model
         #region OTHER METHODS
         private void restart()
         {
+            currentPlayer = Player.White;
             for (var i = 0; i < 8; i++)
                 foreach (Player player in Enum.GetValues((typeof(Player))))
                     pieceBoard[Game.PAWN_ROW(player), i] = Piece.PIECES[player][PieceType.Pawn];

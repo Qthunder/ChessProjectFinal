@@ -6,7 +6,7 @@ namespace ChessProjectFinal.Model
     {
         void DoMove(IMove move);
         void UndoMove();
-        List<Move> GetValidMoves(Player player);
+        IReadOnlyList<Move> GetValidMoves(Player player);
         BoardState GetState();
         void RestoreState(BoardState boardState);
     }

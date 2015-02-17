@@ -4,7 +4,7 @@ namespace ChessProjectFinal.Search
 {
   public interface IState
   {
-      IList<IAction> GetActions();
+      IReadOnlyList<IAction> GetActions();
       IState GetActionResult(IAction action);
 
   }

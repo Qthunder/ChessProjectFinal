@@ -1,8 +1,9 @@
 ﻿using System.Windows;
+using ChessProjectFinal.Search;
 
 namespace ChessProjectFinal.Model
 {
-    public class Move :IMove
+    public class Move :IMove,IAction
     {
         public bool IsEnPassant { get; set; } 
         public bool IsKingSideCastle { get; set; }

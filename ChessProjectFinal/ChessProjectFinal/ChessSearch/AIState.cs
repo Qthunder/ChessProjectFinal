@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows;
 using ChessProjectFinal.Model;
 using ChessProjectFinal.Search;
 
@@ -8,17 +7,21 @@ namespace ChessProjectFinal.ChessSearch
 {
     class AIState : BoardState, IState
     {
-        public AIState(Piece[,] pieceBoard, bool enPassant, Point enPassantSquare, Dictionary<Player, bool> castleQueenSide, Dictionary<Player, bool> castleKingSide) : base(pieceBoard, enPassant, enPassantSquare, castleQueenSide, castleKingSide)
+        public AIState(BoardState that) : base(that)
         {
         }
-        public IList<IAction> GetActions()
+
+        public IReadOnlyList<IAction> GetActions()
         {
-            throw new System.NotImplementedException();
+           return new GameHistory(this).GetValidMoves(CurrentPlayer);
         }
 
         public IState GetActionResult(IAction action)
         {
-            throw new System.NotImplementedException();
+            var board = new GameHistory(this);
+            var move = (Move) action;
+            board.DoMove(move);
+            return new AIState(board.GetState());
         }
     }
 }

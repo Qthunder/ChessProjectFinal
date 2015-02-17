@@ -4,7 +4,7 @@ namespace ChessProjectFinal.Search
 {
     public interface IOrdering
     {
-        IList<IAction> Sort(IList<IAction> actions );
+        IReadOnlyList<IAction> Sort(IReadOnlyList<IAction> actions );
     }
 }
 

@@ -1,8 +1,9 @@
 ﻿using System;
+using ChessProjectFinal.Search;
 
 namespace ChessProjectFinal.Model
 {
-    public interface IMove
+    public interface IMove :IAction
     {
         Boolean IsEnPassant { get; set; }
         Boolean IsKingSideCastle{get; set; }

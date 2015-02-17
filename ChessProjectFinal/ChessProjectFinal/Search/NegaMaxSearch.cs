@@ -13,31 +13,36 @@ namespace ChessProjectFinal.Search
         }
        
 
-        private Tuple<IAction, int> Search(Node node, int depth, int alpha, int beta, int side)
+        private Tuple<IAction, int> search(Node node, int depth, int alpha, int beta, int side)
         {
              //TODO might have to check explicitly if node is terminal (atm i'm assuming the case will be resolved naturally)
             if (depth == 0)
                 return new Tuple<IAction, int>(node.Action,side*heuristic.GetValue(node.State));
             var bestValue = int.MinValue;
+            IAction bestAction = null;
             var  actions = node.State.GetActions();
             actions = ordering.Sort(actions);
             foreach (var action in actions)
             {
                 var child = node.State.GetActionResult(action);
-                var possibleResult= this.Search(new Node(child,action), depth - 1, -beta, -alpha, -side);
-                bestValue = Math.Max(bestValue, possibleResult.Item2);
+                var possibleResult= search(new Node(child,action), depth - 1, -beta, -alpha, -side);
+                if (bestValue < possibleResult.Item2)
+                {
+                    bestValue = possibleResult.Item2;
+                    bestAction = action;
+                }
                 alpha = Math.Max(alpha, possibleResult.Item2);
                 if (alpha >= beta)
                     break;
             }
-            return Tuple.Create(node.Action, bestValue);
+            return Tuple.Create(bestAction, bestValue);
 
         }
 
 
         public Tuple<IAction, int> SearchByDepth(Node node, int depth, int side)
         {
-            return this.Search(node, depth, int.MinValue, int.MaxValue, side);
+            return this.search(node, 2*depth-1, int.MinValue, int.MaxValue, side);
         }
 
         public Tuple<IAction, int> SearchByTime(Node node, int time, int side)

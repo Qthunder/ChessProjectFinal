@@ -56,6 +56,7 @@
     <Compile Include="ChessSearch\AIMove.cs" />
     <Compile Include="ChessSearch\AIState.cs" />
     <Compile Include="ChessSearch\BasicHeuristic.cs" />
+    <Compile Include="ChessSearch\NoOrdering.cs" />
     <Compile Include="Common\DelegateCommand.cs" />
     <Compile Include="Common\RelayCommand.cs" />
     <Compile Include="Converters\BoolToVisibilityConverter.cs" />

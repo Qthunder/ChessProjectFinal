@@ -9,26 +9,27 @@ namespace ChessProjectFinal.Model
         public Piece[,] PieceBoard;
         public bool EnPassant;
         public Point EnPassantSquare;
-        public Dictionary<Player, Boolean> CastleQueenSide = new Dictionary<Player, bool>();
-        public Dictionary<Player, Boolean> CastleKingSide = new Dictionary<Player, bool>();
+        public CastlingRights CastleQueenSide = new CastlingRights(false,false);
+        public CastlingRights CastleKingSide = new CastlingRights(false,false);
+        public Player CurrentPlayer;
 
-        public BoardState(Piece[,] pieceBoard,bool enPassant,Point enPassantSquare,Dictionary<Player,Boolean> castleQueenSide, Dictionary<Player,Boolean> castleKingSide)
+        public BoardState(Piece[,] pieceBoard,bool enPassant,Point enPassantSquare,CastlingRights castleQueenSide, CastlingRights castleKingSide,Player player)
         {
+            CurrentPlayer = player;
             PieceBoard = (Piece[,])pieceBoard.Clone();
             EnPassant = enPassant;
             EnPassantSquare = enPassantSquare;
-            CastleKingSide = new Dictionary<Player, bool>
-            {
-                {Player.White, castleKingSide[Player.White]},
-                {Player.Black, castleKingSide[Player.Black]}
-            };
-            CastleQueenSide = new Dictionary<Player, bool>
-            {
-                {Player.White, castleQueenSide[Player.White]},
-                {Player.Black, castleQueenSide[Player.Black]}
-            };
+            CastleKingSide = castleKingSide;
+            CastleQueenSide = castleQueenSide;
         }
-
+        public BoardState(BoardState that) : this(that.PieceBoard, that.EnPassant, that.EnPassantSquare, that.CastleQueenSide,that.CastleKingSide, that.CurrentPlayer)
+        {
+           
+        }
        
+
+
+
+
     }
 }
