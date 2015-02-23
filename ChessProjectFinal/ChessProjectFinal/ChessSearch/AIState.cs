@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using ChessProjectFinal.Model;
 using ChessProjectFinal.Search;
 
@@ -13,15 +12,18 @@ namespace ChessProjectFinal.ChessSearch
 
         public IReadOnlyList<IAction> GetActions()
         {
-           return new GameHistory(this).GetValidMoves(CurrentPlayer);
+            return GetValidMoves(this, CurrentPlayer); 
         }
 
         public IState GetActionResult(IAction action)
         {
-            var board = new GameHistory(this);
             var move = (Move) action;
-            board.DoMove(move);
-            return new AIState(board.GetState());
+            return new AIState(DoMove(this, move));
+        }
+
+        public bool IsTerminal()
+        {
+            return IsCheckMate(this,CurrentPlayer) || IsStaleMate(this,CurrentPlayer);
         }
     }
 }

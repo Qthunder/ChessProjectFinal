@@ -4,11 +4,16 @@ using ChessProjectFinal.Search;
 
 namespace ChessProjectFinal.ChessSearch
 {
-    public class BasicHeuristic :IHeuristic
+    public class EvaluationFunction :IHeuristic
     {
         public int GetValue(IState state)
         {
             var boardState = (AIState) state;
+            var sideToPlay = boardState.CurrentPlayer == Player.White ? 1 : -1;
+            if (BoardState.IsCheckMate(boardState, boardState.CurrentPlayer))
+                return 1000*sideToPlay*-1;
+            if (BoardState.IsStaleMate(boardState, boardState.CurrentPlayer))
+                return 0;
             var material = 0;
             for (var i=0; i<8; i++)
                 for (var j = 0; j < 8; j++)
@@ -34,8 +39,8 @@ namespace ChessProjectFinal.ChessSearch
                             break;
                     }
                 }
-            var board = new GameHistory(boardState);
-            var mobility =10 *( board.GetValidMoves(Player.White).Count - board.GetValidMoves(Player.Black).Count);
+            
+            var mobility =10 *(BoardState.GetValidMoves(boardState,Player.White).Count - BoardState.GetValidMoves(boardState,Player.Black).Count);
             var doublePawns = 0;
             foreach (Player player in Enum.GetValues(typeof (Player)))
             { var side = player == Player.White ? -1 : 1;

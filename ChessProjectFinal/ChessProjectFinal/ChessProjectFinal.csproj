@@ -55,7 +55,8 @@
     </ApplicationDefinition>
     <Compile Include="ChessSearch\AIMove.cs" />
     <Compile Include="ChessSearch\AIState.cs" />
-    <Compile Include="ChessSearch\BasicHeuristic.cs" />
+    <Compile Include="ChessSearch\EvaluationFunction.cs" />
+    <Compile Include="ChessSearch\NegaMaxSearchChess.cs" />
     <Compile Include="ChessSearch\NoOrdering.cs" />
     <Compile Include="Common\DelegateCommand.cs" />
     <Compile Include="Common\RelayCommand.cs" />
@@ -67,7 +68,9 @@
     <Compile Include="Converters\PointToColorConverter.cs" />
     <Compile Include="Model\Board.cs" />
     <Compile Include="Model\BoardState.cs" />
+    <Compile Include="Model\CastlingRights.cs" />
     <Compile Include="Model\Game.cs" />
+    <Compile Include="Model\GameHistory.cs" />
     <Compile Include="Model\IBoard.cs" />
     <Compile Include="Model\IInternalBoard.cs" />
     <Compile Include="Model\IMove.cs" />
@@ -82,6 +85,7 @@
     <Compile Include="Search\IHeuristic.cs" />
     <Compile Include="Search\IOrdering.cs" />
     <Compile Include="Search\IState.cs" />
+    <Compile Include="Search\NoAction.cs" />
     <Compile Include="Search\Node.cs" />
     <Compile Include="Search\NegaMaxSearch.cs" />
     <Compile Include="Search\ISearch.cs" />

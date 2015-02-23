@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Windows;
 using ChessProjectFinal.ChessSearch;
 using ChessProjectFinal.Common;
@@ -12,11 +13,10 @@ namespace ChessProjectFinal.Model
         #region CONSTRUCTOR
         public Game()
         {
-            WhitePlayer = PlayerType.Human;
-            BlackPlayer = PlayerType.AI;
-            playerSearches[Player.Black]=new NegaMaxSearch(new BasicHeuristic(), new NoOrdering());
-            playerSearches[Player.White] = new NegaMaxSearch(new BasicHeuristic(), new NoOrdering());
-
+            WhitePlayer = PlayerType.AI;
+            BlackPlayer = PlayerType.Human;
+            playerSearches[Player.Black]=new NegaMaxSearchChess(new EvaluationFunction(), new NoOrdering());
+            playerSearches[Player.White] = new NegaMaxSearchChess(new EvaluationFunction(), new NoOrdering());
             Restart();
         }
         #endregion
@@ -40,28 +40,21 @@ namespace ChessProjectFinal.Model
         #endregion
         #region PRIVATE BACKING FIELDS
         private Board board;
-        private IInternalBoard internalBoard;
-        private Player currentPlayer;
+        private GameHistory gameHistory;
+        
         private bool isActive;
         private bool isBusy;
+
+     
         private readonly Dictionary<Player,PlayerType> playerTypes=new Dictionary<Player,PlayerType>(); 
         private readonly Dictionary<Player,ISearch> playerSearches=new Dictionary<Player,ISearch>(); 
         #endregion
         #region PROPERTIES 
-        public Player CurrentPlayer
+       
+        public GameHistory GameHistory
         {
-            get { return currentPlayer; }
-            set
-            {
-                currentPlayer = value;
-                RaisePropertyChanged(() => CurrentPlayer);
-
-            }
-        }
-        public IInternalBoard InternalBoard
-        {
-            get { return internalBoard; }
-            set { internalBoard = value; }
+            get { return gameHistory; }
+            set { gameHistory = value; }
         }
         public Board Board
         {
@@ -75,34 +68,34 @@ namespace ChessProjectFinal.Model
 
         }
         public bool IsActive { get { return isActive; } set { isActive = value; } }
-        public bool IsBusy { get { return isBusy; } set { isBusy = value; } }
+        public bool IsBusy { get { return isBusy; } set { isBusy = value; RaisePropertyChanged(()=>IsBusy); } }
         #endregion
         #region PUBLIC METHODS
-        public void DoMove(Move move)
-        {
-            
-        }
         public void MovePiece(ISquare targetSquare)
         {
             var move = createMove(Board.SelectedSquare, targetSquare);
-            InternalBoard.DoMove(move);
-            swapPlayer();
-            ReSync();
-            checkAI();
-
-          
+            GameHistory.MakeMove(move);
+            reSync();
+            Board.SelectedSquare = null;
+            if (IsActive)
+               new Thread(checkAI).Start();
+            
         }
        
         public void Restart()
         {
             Board = new Board();
-            InternalBoard = new GameHistory();
-            Board.Initialize();
-            CurrentPlayer = Player.White;
-            ReSync();
+            GameHistory = new GameHistory();
             IsActive = true;
-            this.checkAI();
+            reSync();
+            IsActive = true;
+            new Thread(checkAI).Start(); 
 
+        }
+
+        public void GameEnd()
+        {
+            IsActive = false;
         }
 
         public PlayerType WhitePlayer
@@ -130,10 +123,10 @@ namespace ChessProjectFinal.Model
         #endregion
         #region PRIVATE METHODS
         
-        private void ReSync()
+        private void reSync()
         {
-            var moves = InternalBoard.GetValidMoves(CurrentPlayer);
-            var state = InternalBoard.GetState();
+            var moves = BoardState.GetValidMoves(GameHistory.CurrentState, GameHistory.CurrentState.CurrentPlayer); 
+            var state = GameHistory.CurrentState;
             Board.Pieces.Clear();
             foreach (var square in Board.Squares)
             {
@@ -145,6 +138,8 @@ namespace ChessProjectFinal.Model
             {
                 Board.IndexedSquares[move.From].MoveSquares.Add(Board.IndexedSquares[move.To]);
             }
+            if (BoardState.IsCheckMate(GameHistory.CurrentState, GameHistory.CurrentState.CurrentPlayer) ||BoardState.IsStaleMate(GameHistory.CurrentState,GameHistory.CurrentState.CurrentPlayer))
+                GameEnd();
         }
 
         private Move createMove(ISquare fromSquare, ISquare targetSquare)
@@ -154,7 +149,7 @@ namespace ChessProjectFinal.Model
             if (piece.PieceType == PieceType.Pawn &&
                 targetSquare.Row == BASE_ROW(OTHER_PLAYER(piece.Player)))
             {
-                var promotionPiece = this.promoteDialog();
+                var promotionPiece = promoteDialog();
                 return new Move(fromSquare.Coords,targetSquare.Coords,piece,capturedPiece){Promotion = promotionPiece};
             }
             if (piece.PieceType == PieceType.Pawn && fromSquare.Column != targetSquare.Column &&  targetSquare.Occupant==null ) 
@@ -169,7 +164,7 @@ namespace ChessProjectFinal.Model
 
         private Piece promoteDialog()
         {
-            var viewModel = new PromotionViewModel(CurrentPlayer);
+            var viewModel = new PromotionViewModel(GameHistory.CurrentState.CurrentPlayer);
             return viewModel.PieceStruct;
         }
 
@@ -177,22 +172,24 @@ namespace ChessProjectFinal.Model
 
         
 
-        private void swapPlayer()
-        {
-            CurrentPlayer = OTHER_PLAYER(CurrentPlayer);
-            Board.SelectedSquare = null;
-        }
+       
         
         private void checkAI()
         {
-            var side = CurrentPlayer == Player.White ? 1 : -1;
-            if (this.playerTypes[this.CurrentPlayer] != PlayerType.AI) return;
-            var result = this.playerSearches[this.CurrentPlayer].SearchByDepth(new Node(new AIState(InternalBoard.GetState()), null), 2,side);
-            var moveToMake = (Move) result.Item1;
-            InternalBoard.DoMove(moveToMake);
-            swapPlayer();
-            ReSync();
-            checkAI();
+            IsBusy = true;
+            var side = GameHistory.CurrentState.CurrentPlayer == Player.White ? 1 : -1;
+            if (playerTypes[GameHistory.CurrentState.CurrentPlayer] != PlayerType.AI)
+            {
+                IsBusy = false;
+                return;
+                
+            }
+            var result = playerSearches[GameHistory.CurrentState.CurrentPlayer].SearchByDepth(new Node(new AIState(GameHistory.CurrentState),null,null), 2,side);
+            var moveToMake = (Move) result;
+               GameHistory.MakeMove(moveToMake);
+            reSync();
+            IsBusy = false;
+           
         }
             #endregion
 

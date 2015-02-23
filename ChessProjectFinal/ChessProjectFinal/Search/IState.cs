@@ -6,6 +6,7 @@ namespace ChessProjectFinal.Search
   {
       IReadOnlyList<IAction> GetActions();
       IState GetActionResult(IAction action);
+      bool IsTerminal();
 
   }
 }

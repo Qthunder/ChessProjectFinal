@@ -7,7 +7,19 @@ namespace ChessProjectFinal.Model
 {
       public class Board : BasePropertyChanged,IBoard
     {
-
+          public Board()
+          {
+              Squares = new ObservableCollection<ISquare>();
+              Pieces = new ObservableCollection<Piece>();
+              IndexedSquares = new Dictionary<Point, ISquare>();
+              for (int i = 0; i < Game.BOARD_SIZE; i++)
+                  for (int j = 0; j < Game.BOARD_SIZE; j++)
+                  {
+                      var newSquare = new Square(i, j);
+                      Squares.Add(newSquare);
+                      IndexedSquares.Add(new Point(i, j), newSquare);
+                  }
+          }
         #region PRIVATE BACKING FIELDS
 
         private ObservableCollection<Piece> pieces;
@@ -116,16 +128,7 @@ namespace ChessProjectFinal.Model
         }
         public void Initialize()
         {
-            Squares = new ObservableCollection<ISquare>();
-            Pieces = new ObservableCollection<Piece>();
-            IndexedSquares = new Dictionary<Point, ISquare>();
-            for (int i = 0; i < Game.BOARD_SIZE; i++)
-                for (int j = 0; j < Game.BOARD_SIZE; j++)
-                {
-                    var newSquare = new Square(i, j);
-                    Squares.Add(newSquare);
-                    IndexedSquares.Add(new Point(i,j),newSquare );
-                }
+            
 
         }
         #endregion
