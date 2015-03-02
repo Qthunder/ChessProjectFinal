@@ -15,8 +15,8 @@ namespace ChessProjectFinal.Model
         {
             WhitePlayer = PlayerType.AI;
             BlackPlayer = PlayerType.Human;
-            playerSearches[Player.Black]=new NegaMaxSearchChess(new EvaluationFunction(), new NoOrdering());
-            playerSearches[Player.White] = new NegaMaxSearchChess(new EvaluationFunction(), new NoOrdering());
+            playerSearches[Player.Black]= new NegaMaxSearchChess(new EvaluationFunction());
+            playerSearches[Player.White] =new NegaMaxSearchChess(new EvaluationFunction());
             Restart();
         }
         #endregion
@@ -47,7 +47,7 @@ namespace ChessProjectFinal.Model
 
      
         private readonly Dictionary<Player,PlayerType> playerTypes=new Dictionary<Player,PlayerType>(); 
-        private readonly Dictionary<Player,ISearch> playerSearches=new Dictionary<Player,ISearch>(); 
+        private readonly Dictionary<Player,NegaMaxSearchChess> playerSearches=new Dictionary<Player,NegaMaxSearchChess>(); 
         #endregion
         #region PROPERTIES 
        
@@ -174,7 +174,7 @@ namespace ChessProjectFinal.Model
 
        
         
-        private void checkAI()
+        private async void checkAI()
         {
             IsBusy = true;
             var side = GameHistory.CurrentState.CurrentPlayer == Player.White ? 1 : -1;
@@ -184,8 +184,8 @@ namespace ChessProjectFinal.Model
                 return;
                 
             }
-            var result = playerSearches[GameHistory.CurrentState.CurrentPlayer].SearchByDepth(new Node(new AIState(GameHistory.CurrentState),null,null), 2,side);
-            var moveToMake = (Move) result;
+            var task = playerSearches[GameHistory.CurrentState.CurrentPlayer].Search(GameHistory.CurrentState.CurrentPlayer,GameHistory.CurrentState,4,20);
+            var moveToMake = await task;
                GameHistory.MakeMove(moveToMake);
             reSync();
             IsBusy = false;

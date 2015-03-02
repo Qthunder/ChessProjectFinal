@@ -1,14 +1,12 @@
 ﻿using System;
 using ChessProjectFinal.Model;
-using ChessProjectFinal.Search;
 
 namespace ChessProjectFinal.ChessSearch
 {
-    public class EvaluationFunction :IHeuristic
+    public class EvaluationFunction 
     {
-        public int GetValue(IState state)
+        public int GetValue(BoardState boardState)
         {
-            var boardState = (AIState) state;
             var sideToPlay = boardState.CurrentPlayer == Player.White ? 1 : -1;
             if (BoardState.IsCheckMate(boardState, boardState.CurrentPlayer))
                 return 1000*sideToPlay*-1;
