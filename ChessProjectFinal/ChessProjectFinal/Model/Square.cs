@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Windows;
 using ChessProjectFinal.Common;
+using ChessProjectFinal.Entities;
 
 namespace ChessProjectFinal.Model
 {

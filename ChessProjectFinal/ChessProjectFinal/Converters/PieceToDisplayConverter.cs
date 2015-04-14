@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Windows.Data;
+using ChessProjectFinal.Entities;
 using ChessProjectFinal.Model;
 
 namespace ChessProjectFinal.Converters
@@ -11,29 +14,30 @@ namespace ChessProjectFinal.Converters
 
 
         static PieceToDisplayConverter()
-        {   PIECE_COLOR.Add(Player.White,"white");
-            PIECE_COLOR.Add(Player.Black,"black");
-            PIECE_TYPE.Add(PieceType.Pawn, "pawn");
-            PIECE_TYPE.Add(PieceType.Knight, "knight");
-            PIECE_TYPE.Add(PieceType.Bishop, "bishop");
-            PIECE_TYPE.Add(PieceType.Queen, "queen");
-            PIECE_TYPE.Add(PieceType.King, "king");
-            PIECE_TYPE.Add(PieceType.Rook, "rook");
+        {   PIECE_COLOR.Add(Player.WHITE,"white");
+            PIECE_COLOR.Add(Player.BLACK,"black");
+            PIECE_TYPE.Add(PieceType.PAWN, "pawn");
+            PIECE_TYPE.Add(PieceType.KNIGHT, "knight");
+            PIECE_TYPE.Add(PieceType.BISHOP, "bishop");
+            PIECE_TYPE.Add(PieceType.QUEEN, "queen");
+            PIECE_TYPE.Add(PieceType.KING, "king");
+            PIECE_TYPE.Add(PieceType.ROOK, "rook");
         }
 
-        public object Convert(object value, System.Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             var piece = (Piece)value;
             if (piece == null)
                 return null;
-            var source = "http://www.wpclipart.com/recreation/games/chess/chess_set_1/chess_piece_" +PIECE_COLOR[piece.Player] + "_" + PIECE_TYPE[piece.PieceType] + "_T.png";
+           var source = Path.GetFullPath(@"..\..\Resources\chess_piece_"+PIECE_COLOR[piece.Player] + "_" + PIECE_TYPE[piece.PieceType] + "_T.png");
+        
             return source;
 
         }
 
-        public object ConvertBack(object value, System.Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

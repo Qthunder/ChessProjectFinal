@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Media;
 using System.Threading;
 using System.Windows;
+using System.Windows.Media;
 using ChessProjectFinal.ChessSearch;
 using ChessProjectFinal.Common;
-using ChessProjectFinal.Search;
+using ChessProjectFinal.Entities;
 using ChessProjectFinal.ViewModel;
 
 namespace ChessProjectFinal.Model
@@ -13,29 +17,31 @@ namespace ChessProjectFinal.Model
         #region CONSTRUCTOR
         public Game()
         {
-            WhitePlayer = PlayerType.AI;
-            BlackPlayer = PlayerType.Human;
-            playerSearches[Player.Black]= new NegaMaxSearchChess(new EvaluationFunction());
-            playerSearches[Player.White] =new NegaMaxSearchChess(new EvaluationFunction());
-            Restart();
+            WhitePlayer = PlayerType.HUMAN;
+            BlackPlayer = PlayerType.HUMAN;
+            playerSearches[Player.BLACK]= new NegaMaxSearchChess(new EvaluationFunction());
+            playerSearches[Player.WHITE] =new NegaMaxSearchChess(new EvaluationFunction());
+            Board = new Board();
+            Start();
         }
         #endregion
         #region STATIC HELPER FUNCTIONS
         public static Player OTHER_PLAYER(Player player)
         {
-            return player == Player.White ? Player.Black : Player.White;
+            return player == Player.WHITE ? Player.BLACK : Player.WHITE;
         }
         public const int BOARD_SIZE = 8;
         public static int BASE_ROW(Player player)
 
 
         {
-            return player == Player.White ? 0 : 7;
+            return player == Player.WHITE ? 0 : 7;
         }
         public static int PAWN_ROW(Player player)
         {
-            return player == Player.White ? 1 : 6;
+            return player == Player.WHITE ? 1 : 6;
         }
+        public static MediaPlayer SoundPlayer= new MediaPlayer();
         
         #endregion
         #region PRIVATE BACKING FIELDS
@@ -75,47 +81,49 @@ namespace ChessProjectFinal.Model
         {
             var move = createMove(Board.SelectedSquare, targetSquare);
             GameHistory.MakeMove(move);
-            reSync();
+            ReSync();
             Board.SelectedSquare = null;
             if (IsActive)
-               new Thread(checkAI).Start();
+               new Thread(CheckAI).Start();
             
         }
        
-        public void Restart()
+        public void Start()
         {
-            Board = new Board();
+            
             GameHistory = new GameHistory();
             IsActive = true;
-            reSync();
-            IsActive = true;
-            new Thread(checkAI).Start(); 
+            ReSync();
+            new Thread(CheckAI).Start(); 
 
         }
 
-        public void GameEnd()
+        public void EndGame()
         {
             IsActive = false;
+            var path = new Uri(Path.GetFullPath(@"..\..\Resources\VictorySound.wav"));
+            SoundPlayer.Open(path);
+            SoundPlayer.Play();
         }
 
         public PlayerType WhitePlayer
         {
-            get { return playerTypes[Player.White]; }
+            get { return playerTypes[Player.WHITE]; }
 
             set
             {
-                playerTypes.Add(Player.White, value);
+                playerTypes.Add(Player.WHITE, value);
                 RaisePropertyChanged(() => WhitePlayer);
             }
         }
 
         public PlayerType BlackPlayer
         {
-            get { return playerTypes[Player.Black]; }
+            get { return playerTypes[Player.BLACK]; }
 
             set
             {
-                playerTypes[Player.Black] = value;
+                playerTypes[Player.BLACK] = value;
                 RaisePropertyChanged(() => BlackPlayer);
             }
         }
@@ -123,7 +131,7 @@ namespace ChessProjectFinal.Model
         #endregion
         #region PRIVATE METHODS
         
-        private void reSync()
+        public void ReSync()
         {
             var moves = BoardState.GetValidMoves(GameHistory.CurrentState, GameHistory.CurrentState.CurrentPlayer); 
             var state = GameHistory.CurrentState;
@@ -138,26 +146,30 @@ namespace ChessProjectFinal.Model
             {
                 Board.IndexedSquares[move.From].MoveSquares.Add(Board.IndexedSquares[move.To]);
             }
+            var path = new Uri(Path.GetFullPath(@"..\..\Resources\MoveSound.wav"));
+            SoundPlayer.Open(path);
+            SoundPlayer.Play();
             if (BoardState.IsCheckMate(GameHistory.CurrentState, GameHistory.CurrentState.CurrentPlayer) ||BoardState.IsStaleMate(GameHistory.CurrentState,GameHistory.CurrentState.CurrentPlayer))
-                GameEnd();
+                EndGame();
         }
 
         private Move createMove(ISquare fromSquare, ISquare targetSquare)
         {
             var capturedPiece = targetSquare.Occupant;
             var piece = fromSquare.Occupant;
-            if (piece.PieceType == PieceType.Pawn &&
+            if (piece.PieceType == PieceType.PAWN &&
                 targetSquare.Row == BASE_ROW(OTHER_PLAYER(piece.Player)))
             {
                 var promotionPiece = promoteDialog();
-                return new Move(fromSquare.Coords,targetSquare.Coords,piece,capturedPiece){Promotion = promotionPiece};
+                return new Move(fromSquare.Coords, targetSquare.Coords, piece, capturedPiece, false, false, false,
+                    promotionPiece);
             }
-            if (piece.PieceType == PieceType.Pawn && fromSquare.Column != targetSquare.Column &&  targetSquare.Occupant==null ) 
-                return new Move(fromSquare.Coords,targetSquare.Coords,piece, Board.IndexedSquares[new Point(targetSquare.Column,fromSquare.Row)].Occupant){IsEnPassant = true};
-            if (piece.PieceType==PieceType.King && fromSquare.Column+2==targetSquare.Column)
-                return new Move(fromSquare.Coords,targetSquare.Coords,piece,null){IsKingSideCastle = true};
-            if (piece.PieceType == PieceType.King &&fromSquare.Column - 2 == targetSquare.Column)
-                return new Move(fromSquare.Coords, targetSquare.Coords, piece, null) { IsQueenSideCastle = true };
+            if (piece.PieceType == PieceType.PAWN && fromSquare.Column != targetSquare.Column &&  targetSquare.Occupant==null ) 
+                return new Move(fromSquare.Coords,targetSquare.Coords,piece, Board.IndexedSquares[new Point(targetSquare.Column,fromSquare.Row)].Occupant,true,false,false,null);
+            if (piece.PieceType == PieceType.KING && fromSquare.Column + 2 == targetSquare.Column)
+                return new Move(fromSquare.Coords, targetSquare.Coords, piece, null, false, true, false, null);
+            if (piece.PieceType == PieceType.KING && fromSquare.Column - 2 == targetSquare.Column)
+                return new Move(fromSquare.Coords, targetSquare.Coords, piece, null, false, false, true, null);
 
             return new Move(fromSquare.Coords, targetSquare.Coords, piece, capturedPiece);
         }
@@ -174,20 +186,18 @@ namespace ChessProjectFinal.Model
 
        
         
-        private async void checkAI()
+        public async void CheckAI()
         {
             IsBusy = true;
-            var side = GameHistory.CurrentState.CurrentPlayer == Player.White ? 1 : -1;
             if (playerTypes[GameHistory.CurrentState.CurrentPlayer] != PlayerType.AI)
             {
                 IsBusy = false;
                 return;
                 
             }
-            var task = playerSearches[GameHistory.CurrentState.CurrentPlayer].Search(GameHistory.CurrentState.CurrentPlayer,GameHistory.CurrentState,4,20);
-            var moveToMake = await task;
-               GameHistory.MakeMove(moveToMake);
-            reSync();
+            var task = playerSearches[GameHistory.CurrentState.CurrentPlayer].Search(GameHistory.CurrentState.CurrentPlayer,GameHistory.CurrentState,6,1000000);
+            GameHistory.MakeMove(await task);
+            ReSync();
             IsBusy = false;
            
         }

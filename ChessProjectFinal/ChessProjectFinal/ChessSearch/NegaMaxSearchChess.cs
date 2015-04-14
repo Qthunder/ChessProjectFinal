@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ChessProjectFinal.Entities;
 using ChessProjectFinal.Model;
 
 namespace ChessProjectFinal.ChessSearch
@@ -14,7 +15,7 @@ namespace ChessProjectFinal.ChessSearch
 
         private static Player player(int side)
         {
-            return (side == 1) ? Player.White : Player.Black;
+            return (side == 1) ? Player.WHITE : Player.BLACK;
         }
 
         private const int INFINITY = 10000;
@@ -40,17 +41,17 @@ namespace ChessProjectFinal.ChessSearch
 
         private Task<Move> iterativeDeapeningSearch(Player player, BoardState boardState, int depth, CancellationToken ct)
         {   
-            var side = player == Player.White ? 1 : -1;
+            var side = player == Player.WHITE ? 1 : -1;
             var searchTask = Task.Factory.StartNew(() =>
             {
                 var bestPath = ImmutableStack<Move>.Empty;
-                for (var currentDepth = 0; currentDepth < depth; currentDepth++)
+                for (var currentDepth = 1; currentDepth < depth; currentDepth++)
                 {   
                     ImmutableStack<Move> newPath;
                     searchTillDepth(boardState, currentDepth, -INFINITY*side, INFINITY*side, side, bestPath,out newPath);
                     bestPath = newPath;
 
-                    if (!ct.IsCancellationRequested) continue;
+                    if (!ct.IsCancellationRequested ) continue;
                     Console.WriteLine("Searched until depth " + currentDepth);
                     return bestPath.Peek();
                 }
@@ -68,8 +69,16 @@ namespace ChessProjectFinal.ChessSearch
         private int searchTillDepth(BoardState boardState, int depth, int alpha, int beta,int side,
             ImmutableStack<Move> principleVariation,out ImmutableStack<Move> path)
         {
+            if (boardState.PieceBoard[7,4]!=null && boardState.PieceBoard[7,4]==Piece.WHITE_ROOK && depth==1)
+                Console.Write("");
+            if (boardState.PieceBoard[7, 4] != null && boardState.PieceBoard[7, 4] == Piece.WHITE_ROOK && depth == 2)
+                Console.Write("");
+            if (boardState.PieceBoard[7, 4] != null && boardState.PieceBoard[7, 4] == Piece.WHITE_ROOK && depth == 3)
+                Console.Write("");
+            if (boardState.PieceBoard[7, 4] != null && boardState.PieceBoard[7, 4] == Piece.WHITE_ROOK && depth == 4)
+                Console.Write("");
             path = ImmutableStack<Move>.Empty;
-
+         
             if (depth == 0 || BoardState.IsStaleMate(boardState, player(side)) ||
                 BoardState.IsCheckMate(boardState, player(side)))
             {
@@ -84,10 +93,12 @@ namespace ChessProjectFinal.ChessSearch
           
             foreach (var move in moves)
             {
+               
+
                 var newState = BoardState.DoMove(boardState, move);
                 ImmutableStack<Move> possiblePath;
-                var tail = principleVariation.IsEmpty ? principleVariation : principleVariation.Pop();
-                var possibleValue = - searchTillDepth(newState, depth - 1, -beta, -alpha, -side, tail,  out possiblePath);
+             //   var tail = principleVariation.IsEmpty ? principleVariation : principleVariation.Pop();
+                var possibleValue = - searchTillDepth(newState, depth - 1, -beta, -alpha, -side, ImmutableStack<Move>.Empty,  out possiblePath);
                 if (possibleValue > bestValue)
                 {
                     bestValue = possibleValue;
@@ -104,8 +115,7 @@ namespace ChessProjectFinal.ChessSearch
 
         private IReadOnlyList<Move> orderMoves(IReadOnlyList<Move> moves, Move principleMove)
         {
-            var sortedMoves = new List<Move>();
-            sortedMoves.Add(principleMove);
+            var sortedMoves = new List<Move> {principleMove};
             sortedMoves.AddRange(moves.Where(move => move.CapturedPiece != null));
             sortedMoves.AddRange(moves.Where(move => move.CapturedPiece == null));
             return sortedMoves;

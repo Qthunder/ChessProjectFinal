@@ -1,4 +1,6 @@
-﻿namespace ChessProjectFinal.Model
+﻿using ChessProjectFinal.Entities;
+
+namespace ChessProjectFinal.Model
 {
     public struct CastlingRights
     {
@@ -35,10 +37,10 @@
 
         public bool this[Player index]
         {
-            get { return index == Player.White ? whitePlayer : blackPlayer; }
+            get { return index == Player.WHITE ? whitePlayer : blackPlayer; }
             set
             {
-                if (index == Player.White)
+                if (index == Player.WHITE)
                 {
                     this.whitePlayer = value;
                 }

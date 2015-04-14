@@ -10,7 +10,8 @@ namespace ChessProjectFinal.Converters
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             var point = (System.Windows.Point)value;
-            var color = (point.X + point.Y) % 2 == 0 ? Colors.BlanchedAlmond : Colors.CadetBlue;
+          
+                var color = (point.X + point.Y)%2 == 0 ? Color.FromArgb(192, 89, 32, 8) : Colors.BurlyWood;
             return new SolidColorBrush(color);
         }
 

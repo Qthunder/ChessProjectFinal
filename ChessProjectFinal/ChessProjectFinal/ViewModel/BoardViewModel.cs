@@ -1,87 +1,149 @@
-﻿using System.Windows.Input;
+﻿using System;
+using System.Windows.Input;
+using System.Windows.Media;
 using ChessProjectFinal.Common;
+using ChessProjectFinal.Entities;
 using ChessProjectFinal.Model;
 
 namespace ChessProjectFinal.ViewModel
 {
     public class BoardViewModel : BasePropertyChanged
     {
-        private Game game;
 
+        #region Constructor
+       
+        public BoardViewModel()
+        {
+            Game = new Game();
+            BoardEditorViewModel = new BoardEditorViewModel(Game.Board);
+        }
+        #endregion
+        #region PRIVATE BACKING FIELDS
+        private Game game;
+        private Boolean editorMode;
+        private BoardEditorViewModel boardEditorViewModel;
+        private DelegateCommand<Square> makeMoveCommand;
+        private ICommand editModeCommand;
+        private ICommand restartCommand;
+        private ICommand saveChangesCommand;
+        private DelegateCommand<Square> activatePieceCommand;
+        #endregion
+        #region PUBLIC PROPERTIES
+        public Boolean EditorMode
+        {
+            get { return editorMode; }
+            set
+            {
+                editorMode = value;
+                RaisePropertyChanged(() => EditorMode);
+            }
+        }
+        public BoardEditorViewModel BoardEditorViewModel
+        {
+            get { return boardEditorViewModel; }
+            set
+            {
+                boardEditorViewModel = value;
+                RaisePropertyChanged(() => BoardEditorViewModel);
+            }
+        }
         public Game Game
         {
             get { return game; }
             set
             {
                 game = value;
-                this.RaisePropertyChanged(()=>Game);
+                RaisePropertyChanged(() => Game);
             }
         }
 
-        private DelegateCommand<Square> activatePieceCommand;
-
-        private DelegateCommand<Square> makeMoveCommand;
-        private ICommand restartCommand;
-
+#endregion
+        #region COMMANDS
         public DelegateCommand<Square> ActivatePieceCommand
         {
             get
             {
-                if (this.activatePieceCommand == null)
-                    this.activatePieceCommand = new DelegateCommand<Square>(ActivatePiece);
+                if (activatePieceCommand == null)
+                    activatePieceCommand = new DelegateCommand<Square>(activatePiece);
                 return activatePieceCommand;
             }
         }
-
         public DelegateCommand<Square> MakeMoveCommand
         {
             get
             {
-                if (this.makeMoveCommand == null)
-                    this.makeMoveCommand = new DelegateCommand<Square>(MakeMove);
+                if (makeMoveCommand == null)
+                    makeMoveCommand = new DelegateCommand<Square>(makeMove);
                 return makeMoveCommand;
             }
         }
-
-        public ICommand RestartCommand
+        public ICommand EditModeCommand
         {
-            
             get
             {
-                if (restartCommand==null)
-                    restartCommand=new RelayCommand(this.restart);
+                if (editModeCommand == null)
+                    editModeCommand = new RelayCommand(changeEditMode);
+                return editModeCommand;
+
+            }
+         
+        }
+        public ICommand RestartCommand
+        {
+
+            get
+            {
+                if (restartCommand == null)
+                    restartCommand = new RelayCommand(restart);
                 return restartCommand;
             }
         }
+        public ICommand SaveChangesCommand
+        {
 
+            get
+            {
+                if (saveChangesCommand == null)
+                    saveChangesCommand = new RelayCommand(saveChanges);
+                return saveChangesCommand;
+            }
+        }
+        #endregion
+        #region PRIVATE MTHODS
+        private void saveChanges(object obj)
+        {
+            var state = BoardEditorViewModel.GetState();
+
+            Game.GameHistory = new GameHistory(state);
+            Game.ReSync();
+           
+
+
+        }
         private void restart(object obj)
         {
-            this.RestartGame();
+            restartGame();
         }
-        public void ActivatePiece(ISquare targetSquare)
+        private void activatePiece(ISquare targetSquare)
         {
-            if (!this.Game.IsActive) return;
+            if (!Game.IsActive) return;
             if (targetSquare.IsMoveable && !targetSquare.IsActive)
             {
                 targetSquare.IsActive = true;
-                this.Game.Board.SelectedSquare = targetSquare;
+                Game.Board.SelectedSquare = targetSquare;
             }
             else
             {
                 if (!targetSquare.IsMoveable) return;
                 targetSquare.IsActive = false;
-                this.Game.Board.SelectedSquare = null;
+                Game.Board.SelectedSquare = null;
             }
         }
-       
-        public void RestartGame()
+        private void restartGame()
         {
-            Game.Restart();
+            Game.Start();
         }
-        
-
-
-        public void MakeMove(Square targetSquare)
+        private void makeMove(Square targetSquare)
         {
             if (Game.IsActive)
             {
@@ -89,10 +151,28 @@ namespace ChessProjectFinal.ViewModel
             }
         }
 
-        public BoardViewModel()
+        private void changeEditMode(object obj)
         {
-            Game = new Game();
-
+            if (EditorMode)
+            {
+                EditorMode = false;
+                Game.ReSync();
+                Game.CheckAI();
+            }
+            else
+            {
+                EditorMode = true;
+                BoardEditorViewModel.BlackCastleKingSide = Game.GameHistory.CurrentState.CastleKingSide[Player.BLACK];
+                BoardEditorViewModel.WhiteCastleKingSide = Game.GameHistory.CurrentState.CastleKingSide[Player.WHITE];
+                BoardEditorViewModel.BlackCastleQueenSide = Game.GameHistory.CurrentState.CastleKingSide[Player.BLACK];
+                BoardEditorViewModel.WhiteCastleQueenSide = Game.GameHistory.CurrentState.CastleKingSide[Player.WHITE];
+                BoardEditorViewModel.PlayerColor = Game.GameHistory.CurrentState.CurrentPlayer==Player.WHITE ? Colors.White :Colors.Black;
+            }
         }
+        #endregion
+        
+       
+
+       
     }
 }

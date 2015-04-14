@@ -1,15 +1,18 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using ChessProjectFinal.Common;
+using ChessProjectFinal.Entities;
 using ChessProjectFinal.Model;
 
 namespace ChessProjectFinal.ViewModel
 {
     public class PromotionViewModel :BasePropertyChanged
     {
+        private ObservableCollection<Piece> promotionPieces;
         public Action CloseAction { get; set; }
 
         private Piece pieceStruct;
-        private readonly Player player;
+       
         public Piece PieceStruct
         {
             get
@@ -20,81 +23,41 @@ namespace ChessProjectFinal.ViewModel
             set
             {
                 pieceStruct = value;
-                this.RaisePropertyChanged(()=>PieceStruct);
+                RaisePropertyChanged(()=>PieceStruct);
             }
         }
 
-
-        private DelegateCommand<object> bishopCommand;
-        private DelegateCommand<object> knightCommand;
-        private DelegateCommand<object> rookCommand;
-        private DelegateCommand<object> queenCommand;
-
-        public DelegateCommand<object> BishopCommand
+        public ObservableCollection<Piece> PromotionPieces
         {
-            get
+            get { return promotionPieces; }
+            set
             {
-                if (this.bishopCommand == null)
-                    this.bishopCommand = new DelegateCommand<object>(this.BishopPick);
-                return bishopCommand;
+                promotionPieces = value;
+                RaisePropertyChanged(()=>PromotionPieces);
             }
-
-        }
-        public DelegateCommand<object> KnightCommand
-        {
-            get
-            {
-                if (this.knightCommand == null)
-                    this.knightCommand = new DelegateCommand<object>(this.KnightPick);
-                return knightCommand;
-            }
-
-        }
-        public DelegateCommand<object> RookCommand
-        {
-            get
-            {
-                if (this.rookCommand == null)
-                    this.rookCommand = new DelegateCommand<object>(this.RookPick);
-                return rookCommand;
-            }
-
-        }
-        public DelegateCommand<object> QueenCommand
-        {
-            get
-            {
-                if (this.queenCommand == null)
-                    this.queenCommand = new DelegateCommand<object>(this.QueenPick);
-                return queenCommand;
-            }
-
+            
         }
 
-        public void BishopPick(object context)
+        public DelegateCommand<Piece> ChoosePieceCommand
         {
-            PieceStruct = Piece.PIECES[player][PieceType.Bishop];
+            get { return choosePieceCommand ?? (choosePieceCommand = new DelegateCommand<Piece>(choosePiece)); }
+        }
+
+        private void choosePiece(Piece selectedPiece)
+        {
+            PieceStruct = selectedPiece;
             CloseAction();
         }
-        public void KnightPick(object context)
-        {
-            PieceStruct = Piece.PIECES[player][PieceType.Knight];
-            CloseAction();
-        }
-        public void RookPick(object context)
-        {
-            PieceStruct = Piece.PIECES[player][PieceType.Rook];
-            CloseAction();
-        }
-        public void QueenPick(object context)
-        {
-            PieceStruct = Piece.PIECES[player][PieceType.Queen];
-            CloseAction();
-        }
+
+       private DelegateCommand<Piece> choosePieceCommand;
+
 
         public PromotionViewModel(Player player)
         {
-            this.player = player;
+            
+            var pieces = Piece.PIECES[player];
+            var choices = new[]{pieces[PieceType.QUEEN], pieces[PieceType.ROOK], pieces[PieceType.BISHOP], pieces[PieceType.KNIGHT]};
+            PromotionPieces= new ObservableCollection<Piece>(choices);
             var view = new View.PromotionView {DataContext = this};
             CloseAction=view.Close;
             view.ShowDialog();

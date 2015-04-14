@@ -1,4 +1,5 @@
 ﻿using System;
+using ChessProjectFinal.Entities;
 using ChessProjectFinal.Model;
 
 namespace ChessProjectFinal.ChessSearch
@@ -7,9 +8,9 @@ namespace ChessProjectFinal.ChessSearch
     {
         public int GetValue(BoardState boardState)
         {
-            var sideToPlay = boardState.CurrentPlayer == Player.White ? 1 : -1;
+            var sideToPlay = boardState.CurrentPlayer == Player.WHITE ? 1 : -1;
             if (BoardState.IsCheckMate(boardState, boardState.CurrentPlayer))
-                return 1000*sideToPlay*-1;
+                return 100000*sideToPlay*-1;
             if (BoardState.IsStaleMate(boardState, boardState.CurrentPlayer))
                 return 0;
             var material = 0;
@@ -17,35 +18,35 @@ namespace ChessProjectFinal.ChessSearch
                 for (var j = 0; j < 8; j++)
                 {
                     if (boardState.PieceBoard[i, j] == null) continue;
-                    var side = boardState.PieceBoard[i, j].Player == Player.White ? 1 : -1;
+                    var side = boardState.PieceBoard[i, j].Player == Player.WHITE ? 1 : -1;
                     switch (boardState.PieceBoard[i, j].PieceType)
                     {
-                        case PieceType.Rook:
+                        case PieceType.ROOK:
                             material += side*500;
                             break;
-                        case PieceType.Knight:
+                        case PieceType.KNIGHT:
                             material += side*300;
                             break;
-                        case PieceType.Bishop:
+                        case PieceType.BISHOP:
                             material +=side* 300;
                             break;
-                        case PieceType.Queen:
+                        case PieceType.QUEEN:
                             material += side*900;
                             break;
-                        case PieceType.Pawn:
+                        case PieceType.PAWN:
                             material +=side* 100;
                             break;
                     }
                 }
             
-            var mobility =10 *(BoardState.GetValidMoves(boardState,Player.White).Count - BoardState.GetValidMoves(boardState,Player.Black).Count);
+            var mobility =10 *(BoardState.GetValidMoves(boardState,Player.WHITE).Count - BoardState.GetValidMoves(boardState,Player.BLACK).Count);
             var doublePawns = 0;
             foreach (Player player in Enum.GetValues(typeof (Player)))
-            { var side = player == Player.White ? -1 : 1;
+            { var side = player == Player.WHITE ? -1 : 1;
                 for (var j = 0; j < 8; j++)
                 {   var pawnCount=0;
                     for (var i = 0; i < 7; i++)
-                        if (boardState.PieceBoard[i, j] == Piece.PIECES[player][PieceType.Pawn])
+                        if (boardState.PieceBoard[i, j] == Piece.PIECES[player][PieceType.PAWN])
                             pawnCount++;
                     if (pawnCount >= 2)
                         doublePawns += (pawnCount - 1)*side*50;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
+using ChessProjectFinal.Entities;
 
 namespace ChessProjectFinal.Model
 {
@@ -12,24 +13,24 @@ namespace ChessProjectFinal.Model
             var pieceBoard = new Piece[8, 8];
             for (var i = 0; i < 8; i++)
                 foreach (Player player in Enum.GetValues((typeof(Player))))
-                    pieceBoard[Game.PAWN_ROW(player), i] = Piece.PIECES[player][PieceType.Pawn];
+                    pieceBoard[Game.PAWN_ROW(player), i] = Piece.PIECES[player][PieceType.PAWN];
 
             foreach (Player color in Enum.GetValues(typeof(Player)))
             {
-                var row = color == Player.White ? 0 : 7;
-                pieceBoard[row, 0] = Piece.PIECES[color][PieceType.Rook];
-                pieceBoard[row, 7] = Piece.PIECES[color][PieceType.Rook];
-                pieceBoard[row, 1] = Piece.PIECES[color][PieceType.Knight];
-                pieceBoard[row, 6] = Piece.PIECES[color][PieceType.Knight];
-                pieceBoard[row, 2] = Piece.PIECES[color][PieceType.Bishop];
-                pieceBoard[row, 5] = Piece.PIECES[color][PieceType.Bishop];
-                pieceBoard[row, 3] = Piece.PIECES[color][PieceType.Queen];
-                pieceBoard[row, 4] = Piece.PIECES[color][PieceType.King];
+                var row = color == Player.WHITE ? 0 : 7;
+                pieceBoard[row, 0] = Piece.PIECES[color][PieceType.ROOK];
+                pieceBoard[row, 7] = Piece.PIECES[color][PieceType.ROOK];
+                pieceBoard[row, 1] = Piece.PIECES[color][PieceType.KNIGHT];
+                pieceBoard[row, 6] = Piece.PIECES[color][PieceType.KNIGHT];
+                pieceBoard[row, 2] = Piece.PIECES[color][PieceType.BISHOP];
+                pieceBoard[row, 5] = Piece.PIECES[color][PieceType.BISHOP];
+                pieceBoard[row, 3] = Piece.PIECES[color][PieceType.QUEEN];
+                pieceBoard[row, 4] = Piece.PIECES[color][PieceType.KING];
 
             }
 
             
-            return new BoardState(pieceBoard, false, new Point(0,0), new CastlingRights(true, true),new CastlingRights(true,true), Player.White);
+            return new BoardState(pieceBoard, false, new Point(0,0), new CastlingRights(true, true),new CastlingRights(true,true), Player.WHITE);
             
           
         }
@@ -46,12 +47,20 @@ namespace ChessProjectFinal.Model
             {
                 newState.PieceBoard[x2, y2] = move.Promotion;
             }
-            if (move.Piece.PieceType == PieceType.Rook || move.Piece.PieceType == PieceType.King)
+            if (move.Piece.PieceType == PieceType.KING)
             {
                 newState.CastleKingSide[move.Piece.Player] = false;
                 newState.CastleQueenSide[move.Piece.Player] = false;
             }
-            if (move.Piece.PieceType == PieceType.Pawn && Math.Abs(x - x2) == 2)
+            if (move.Piece.PieceType == PieceType.ROOK && move.From.Y == 0)
+            {
+                newState.CastleQueenSide[move.Piece.Player] = false;
+            }
+            if (move.Piece.PieceType == PieceType.ROOK && move.From.Y == 7)
+            {
+                newState.CastleKingSide[move.Piece.Player] = false;
+            }
+            if (move.Piece.PieceType == PieceType.PAWN && Math.Abs(x - x2) == 2)
             {
                 newState.EnPassant = true;
                 newState.EnPassantSquare = move.To;
@@ -60,16 +69,16 @@ namespace ChessProjectFinal.Model
                 newState.EnPassant = false;
             if (move.IsEnPassant)
                 newState.PieceBoard[x, y2] = null;
-            var baseRow = move.Piece.Player == Player.White ? 0 : 7;
+            var baseRow = move.Piece.Player == Player.WHITE ? 0 : 7;
             if (move.IsKingSideCastle)
             {
                 newState.PieceBoard[baseRow, 7] = null;
-                newState.PieceBoard[baseRow, 5] = Piece.PIECES[move.Piece.Player][PieceType.Rook];
+                newState.PieceBoard[baseRow, 5] = Piece.PIECES[move.Piece.Player][PieceType.ROOK];
             }
             if (move.IsQueenSideCastle)
             {
                 newState.PieceBoard[baseRow, 0] = null;
-                newState.PieceBoard[baseRow, 3] = Piece.PIECES[move.Piece.Player][PieceType.Rook];
+                newState.PieceBoard[baseRow, 3] = Piece.PIECES[move.Piece.Player][PieceType.ROOK];
             }
             newState.CurrentPlayer = Game.OTHER_PLAYER(boardState.CurrentPlayer);
             return newState;
@@ -98,17 +107,14 @@ namespace ChessProjectFinal.Model
 
 
         }
-
         public static bool IsCheckMate(BoardState boardState,Player player )
         {
             return GetValidMoves(boardState, player).Count == 0;
         }
-
         public static bool IsStaleMate(BoardState boardState, Player player)
         {
             return GetValidMoves(boardState, player).Count == 0 && isCheck(boardState, player);
         }
-
         private static List<Move> getMoves(BoardState boardState,Player player)
         {
             
@@ -122,7 +128,7 @@ namespace ChessProjectFinal.Model
                     {
                         switch (piece.PieceType)
                         {
-                            case PieceType.Bishop:
+                            case PieceType.BISHOP:
                                 foreach (var d1 in new[] { -1, 1 })
                                     foreach (var d2 in new[] { -1, 1 })
                                     {
@@ -130,56 +136,60 @@ namespace ChessProjectFinal.Model
                                         var y = j + d2;
                                         while (x >= 0 && x <= 7 && y >= 0 && y <= 7 && boardState.PieceBoard[x, y] == null)
                                         {
-                                            moveList.Add(new Move { CapturedPiece = boardState.PieceBoard[x, y], From = from, IsEnPassant = false, IsKingSideCastle = false, IsQueenSideCastle = false, Piece = piece, Promotion = null, To = new Point(x, y) });
+                                            moveList.Add(new Move(from, new Point(x, y), piece,boardState.PieceBoard[x, y]));
                                             x += d1;
                                             y += d2;
                                         }
                                         if (x >= 0 && x <= 7 && y >= 0 && y <= 7 && (boardState.PieceBoard[x, y] == null || boardState.PieceBoard[x, y].Player != piece.Player))
-                                            moveList.Add(new Move { CapturedPiece = boardState.PieceBoard[x, y], From = from, IsEnPassant = false, IsKingSideCastle = false, IsQueenSideCastle = false, Piece = piece, Promotion = null, To = new Point(x, y) });
+                                            moveList.Add(new Move(from, new Point(x, y), piece, boardState.PieceBoard[x, y]));
                                     }
 
                                 break;
-                            case PieceType.Rook:
+                            case PieceType.ROOK:
                                 foreach (var d1 in new[] { -1, 1 })
                                 {
                                     var x = i + d1;
                                     while (x >= 0 && x <= 7 && boardState.PieceBoard[x, j] == null)
                                     {
-                                        moveList.Add(new Move { CapturedPiece = boardState.PieceBoard[x, j], From = from, IsEnPassant = false, IsKingSideCastle = false, IsQueenSideCastle = false, Piece = piece, Promotion = null, To = new Point(x, j) });
+                                        moveList.Add(new Move(from,new Point(x,j),piece,boardState.PieceBoard[x,j] ));
                                         x += d1;
                                     }
                                     if (x >= 0 && x <= 7 && (boardState.PieceBoard[x, j] == null || boardState.PieceBoard[x, j].Player != piece.Player))
-                                        moveList.Add(new Move { CapturedPiece = boardState.PieceBoard[x, j], From = from, IsEnPassant = false, IsKingSideCastle = false, IsQueenSideCastle = false, Piece = piece, Promotion = null, To = new Point(x, j) });
+                                        moveList.Add(new Move(from,new Point(x,j),piece,boardState.PieceBoard[x,j]));
                                     x = j + d1;
                                     while (x >= 0 && x <= 7 && boardState.PieceBoard[i, x] == null)
                                     {
-                                        moveList.Add(new Move { CapturedPiece = boardState.PieceBoard[i, x], From = from, IsEnPassant = false, IsKingSideCastle = false, IsQueenSideCastle = false, Piece = piece, Promotion = null, To = new Point(i, x) });
+                                        moveList.Add(new Move(from,new Point(i,x),piece,boardState.PieceBoard[i,x]));
                                         x += d1;
                                     }
                                     if (x >= 0 && x <= 7 && (boardState.PieceBoard[i, x] == null || boardState.PieceBoard[i, x].Player != piece.Player))
-                                        moveList.Add(new Move { CapturedPiece = boardState.PieceBoard[i, x], From = from, IsEnPassant = false, IsKingSideCastle = false, IsQueenSideCastle = false, Piece = piece, Promotion = null, To = new Point(i, x) });
+                                        moveList.Add(new Move(from, new Point(i, x), piece, boardState.PieceBoard[i, x]));
                                 }
                                 break;
-                            case PieceType.Pawn:
-                                var direction = piece.Player == Player.White ? 1 : -1;
-                                var pawnRow = piece.Player == Player.White ? 1 : 6;
+                            case PieceType.PAWN:
+                                var direction = piece.Player == Player.WHITE ? 1 : -1;
+                                var pawnRow = piece.Player == Player.WHITE ? 1 : 6;
 
-                                if (boardState.EnPassant && (boardState.EnPassantSquare == new Point(i, j + 1) || boardState.EnPassantSquare == new Point(i, j - 1)))
-                                    moveList.Add(new Move(from, new Point(i + direction, boardState.EnPassantSquare.Y), piece, boardState.PieceBoard[i, (int)boardState.EnPassantSquare.Y]) { IsEnPassant = true });
+                                if (boardState.EnPassant &&
+                                    (boardState.EnPassantSquare == new Point(i, j + 1) ||
+                                     boardState.EnPassantSquare == new Point(i, j - 1)))
+                                    moveList.Add(new Move(from, new Point(i + direction, boardState.EnPassantSquare.Y),
+                                        piece, boardState.PieceBoard[i, (int) boardState.EnPassantSquare.Y], true, false,
+                                        false, null)); 
 
-                                if (boardState.PieceBoard[i + direction, j] == null)
+                                if ( i+direction<8 && i+direction>-1 && boardState.PieceBoard[i + direction, j] == null)
                                 {
                                     moveList.Add(new Move(from, new Point(i + direction, j), piece, null));
                                     if (i == pawnRow && boardState.PieceBoard[i + direction * 2, j] == null)
                                         moveList.Add(new Move(from, new Point(i + direction * 2, j), piece, null));
                                 }
 
-                                if (j > 0 && boardState.PieceBoard[i + direction, j - 1] != null && boardState.PieceBoard[i + direction, j - 1].Player != piece.Player)
+                                if (i + direction < 8 && i + direction > -1 && j > 0 && boardState.PieceBoard[i + direction, j - 1] != null && boardState.PieceBoard[i + direction, j - 1].Player != piece.Player)
                                     moveList.Add(new Move(from, new Point(i + direction, j - 1), piece, boardState.PieceBoard[i + direction, j - 1]));
-                                if (j < 7 && boardState.PieceBoard[i + direction, j + 1] != null && boardState.PieceBoard[i + direction, j + 1].Player != piece.Player)
+                                if (i + direction < 8 && i + direction > -1 && j < 7 && boardState.PieceBoard[i + direction, j + 1] != null && boardState.PieceBoard[i + direction, j + 1].Player != piece.Player)
                                     moveList.Add(new Move(from, new Point(i + direction, j + 1), piece, boardState.PieceBoard[i + direction, j + 1]));
                                 break;
-                            case PieceType.Knight:
+                            case PieceType.KNIGHT:
                                 var dir1 = new[] { 1, -1, 1, -1, 2, -2, 2, -2 };
                                 var dir2 = new[] { 2, 2, -2, -2, 1, 1, -1, -1 };
                                 for (int k = 0; k < 8; k++)
@@ -190,7 +200,7 @@ namespace ChessProjectFinal.Model
                                         moveList.Add(new Move(from, new Point(a, b), piece, boardState.PieceBoard[a, b]));
                                 }
                                 break;
-                            case PieceType.King:
+                            case PieceType.KING:
                                 var dirs1 = new[] { 1, 1, 1, 0, 0, -1, -1, -1 };
                                 var dirs2 = new[] { 1, 0, -1, 1, -1, 1, 0, -1 };
                                 for (var k = 0; k < 8; k++)
@@ -202,13 +212,13 @@ namespace ChessProjectFinal.Model
 
                                 }
                                 if (boardState.CastleKingSide[piece.Player])
-                                    moveList.Add(new Move(from, new Point(Game.BASE_ROW(piece.Player), 6), piece, null) { IsKingSideCastle = true });
+                                    moveList.Add(new Move(from, new Point(Game.BASE_ROW(piece.Player), 6), piece, null,false, true, false, null));
                                 if (boardState.CastleQueenSide[piece.Player])
-                                    moveList.Add(new Move(from, new Point(Game.BASE_ROW(piece.Player), 2), piece, null) { IsQueenSideCastle = true });
+                                    moveList.Add(new Move(from, new Point(Game.BASE_ROW(piece.Player), 2), piece, null,false, false, true, null));
 
 
                                 break;
-                            case PieceType.Queen:
+                            case PieceType.QUEEN:
                                 foreach (var d1 in new[] { -1, 1 })
                                     foreach (var d2 in new[] { -1, 1 })
                                     {
@@ -216,31 +226,31 @@ namespace ChessProjectFinal.Model
                                         var y = j + d2;
                                         while (x >= 0 && x <= 7 && y >= 0 && y <= 7 && boardState.PieceBoard[x, y] == null)
                                         {
-                                            moveList.Add(new Move { CapturedPiece = boardState.PieceBoard[x, y], From = from, IsEnPassant = false, IsKingSideCastle = false, IsQueenSideCastle = false, Piece = piece, Promotion = null, To = new Point(x, y) });
+                                            moveList.Add(new Move(from,new Point(x,y),piece,boardState.PieceBoard[x,y] ));
                                             x += d1;
                                             y += d2;
                                         }
                                         if (x >= 0 && x <= 7 && y >= 0 && y <= 7 && (boardState.PieceBoard[x, y] == null || boardState.PieceBoard[x, y].Player != piece.Player))
-                                            moveList.Add(new Move { CapturedPiece = boardState.PieceBoard[x, y], From = from, IsEnPassant = false, IsKingSideCastle = false, IsQueenSideCastle = false, Piece = piece, Promotion = null, To = new Point(x, y) });
+                                            moveList.Add(new Move(from, new Point(x, y), piece, boardState.PieceBoard[x, y]));
                                     }
                                 foreach (var d1 in new[] { -1, 1 })
                                 {
                                     var x = i + d1;
                                     while (x >= 0 && x <= 7 && boardState.PieceBoard[x, j] == null)
                                     {
-                                        moveList.Add(new Move { CapturedPiece = boardState.PieceBoard[x, j], From = from, IsEnPassant = false, IsKingSideCastle = false, IsQueenSideCastle = false, Piece = piece, Promotion = null, To = new Point(x, j) });
+                                        moveList.Add(new Move(from, new Point(x, j), piece, boardState.PieceBoard[x, j]));
                                         x += d1;
                                     }
                                     if (x >= 0 && x <= 7 && (boardState.PieceBoard[x, j] == null || boardState.PieceBoard[x, j].Player != piece.Player))
-                                        moveList.Add(new Move { CapturedPiece = boardState.PieceBoard[x, j], From = from, IsEnPassant = false, IsKingSideCastle = false, IsQueenSideCastle = false, Piece = piece, Promotion = null, To = new Point(x, j) });
+                                        moveList.Add(new Move(from, new Point(x, j), piece, boardState.PieceBoard[x, j]));
                                     x = j + d1;
                                     while (x >= 0 && x <= 7 && boardState.PieceBoard[i, x] == null)
                                     {
-                                        moveList.Add(new Move { CapturedPiece = boardState.PieceBoard[i, x], From = from, IsEnPassant = false, IsKingSideCastle = false, IsQueenSideCastle = false, Piece = piece, Promotion = null, To = new Point(i, x) });
+                                        moveList.Add(new Move(from, new Point(i, x), piece, boardState.PieceBoard[i,x]));
                                         x += d1;
                                     }
                                     if (x >= 0 && x <= 7 && (boardState.PieceBoard[i, x] == null || boardState.PieceBoard[i, x].Player != piece.Player))
-                                        moveList.Add(new Move { CapturedPiece = boardState.PieceBoard[i, x], From = from, IsEnPassant = false, IsKingSideCastle = false, IsQueenSideCastle = false, Piece = piece, Promotion = null, To = new Point(i, x) });
+                                        moveList.Add(new Move(from, new Point(i, x), piece, boardState.PieceBoard[i, x]));
                                 }
                                 break;
 
@@ -259,10 +269,11 @@ namespace ChessProjectFinal.Model
         private static bool isCheck(BoardState boardState,Player player)
         {
             var moves=getMoves(boardState,Game.OTHER_PLAYER(player));
-            return moves.Any(move => move.CapturedPiece != null && move.CapturedPiece.PieceType == PieceType.King);
+            return moves.Any(move => move.CapturedPiece != null && move.CapturedPiece.PieceType == PieceType.KING);
         }
-     
-        
+
+
+
         public Piece[,] PieceBoard;
         public bool EnPassant;
         public Point EnPassantSquare;
@@ -284,6 +295,7 @@ namespace ChessProjectFinal.Model
                    CurrentPlayer == other.CurrentPlayer;
         }
 
+      
         public BoardState(Piece[,] pieceBoard,bool enPassant,Point enPassantSquare,CastlingRights castleQueenSide, CastlingRights castleKingSide,Player player)
         {
             CurrentPlayer = player;

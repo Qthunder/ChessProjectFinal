@@ -1,13 +1,13 @@
-﻿namespace ChessProjectFinal.Model
+﻿namespace ChessProjectFinal.Entities
 {
     public enum Player
     {
-        Black,White
+        BLACK,WHITE
     }
 
     public enum PlayerType
     {
         AI,
-        Human
+        HUMAN
     }
 }
