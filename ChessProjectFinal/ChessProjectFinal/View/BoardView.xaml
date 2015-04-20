@@ -2,8 +2,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:viewModel="clr-namespace:ChessProjectFinal.ViewModel"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:view="clr-namespace:ChessProjectFinal.View"
              xmlns:converters="clr-namespace:ChessProjectFinal.Converters"
              mc:Ignorable="d" 
@@ -19,20 +18,17 @@
         <converters:InvertBooleanConverter x:Key="InvertBooleanConverter"></converters:InvertBooleanConverter>
         <converters:InvertedBoolToVisibilityConverter x:Key="InvertedBoolToVisibilityConverter"></converters:InvertedBoolToVisibilityConverter>
     </UserControl.Resources>
-    <UserControl.Background>
-        <SolidColorBrush Color="#B8AE95"></SolidColorBrush>
-    </UserControl.Background>
-    <UserControl.DataContext >
-        <viewModel:BoardViewModel/>
-    </UserControl.DataContext>
+   <UserControl.Background>
+        <SolidColorBrush Color="LightGray"></SolidColorBrush>
+   </UserControl.Background>
+  
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="Game">
-                <MenuItem Header="New Game" Command="{Binding RestartCommand}"></MenuItem>
-                <MenuItem Header="Restart"></MenuItem>
+                <MenuItem Header="New Game" Command="{Binding NewGameCommand}"></MenuItem>
+                <MenuItem Header="Restart" Command="{Binding RestartCommand}"></MenuItem>
                 <MenuItem Header="Edit Mode" IsCheckable="True" Command="{Binding EditModeCommand}"  IsEnabled="{Binding Game.IsBusy,Converter={StaticResource InvertBooleanConverter}}"  ></MenuItem>
                 <MenuItem Header="Settings"></MenuItem>
-
             </MenuItem>
         </Menu>
         <Grid >
@@ -78,7 +74,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate >
-                            <Border BorderThickness="4" BorderBrush="#B3ADAD"  Width="73" Height="73" >
+                            <Border BorderThickness="2" BorderBrush="#B3ADAD"  Width="73" Height="73" >
                                 <Grid>
                                     <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity="1.0" Fill="{Binding Coords,Converter={StaticResource PointToColorConverter}}" Visibility="Visible" IsHitTestVisible="False"></Rectangle>
                                     <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity="1.0" Fill="#C7DFF6" Visibility="{Binding IsValidMove,Converter={StaticResource BoolToVisibilityConverter}}" IsHitTestVisible="False"/>
@@ -159,8 +155,8 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border BorderThickness="1" BorderBrush="Black">
-                                <Button  Margin="2" Width="73" Height="73" HorizontalAlignment="Stretch " VerticalAlignment="Stretch" Command="{Binding DataContext.SelectPieceCommand, RelativeSource={RelativeSource AncestorType=Grid}}" CommandParameter="{Binding }" >
+                            <Border BorderThickness="1.5" BorderBrush="Black">
+                                <Button  Margin="2" Width="65" Height="65" HorizontalAlignment="Stretch " VerticalAlignment="Stretch" Command="{Binding DataContext.SelectPieceCommand, RelativeSource={RelativeSource AncestorType=Grid}}" CommandParameter="{Binding }" >
                                     <Button.Template>
                                         <ControlTemplate>
                                             <Border BorderThickness="1" BorderBrush="Black">
@@ -181,8 +177,8 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Border BorderThickness="1" BorderBrush="Black">
-                                <Button  Margin="2" Width="73" Height="73" HorizontalAlignment="Stretch " VerticalAlignment="Stretch" Command="{Binding DataContext.SelectPieceCommand, RelativeSource={RelativeSource AncestorType=Grid}}" CommandParameter="{Binding }" >
+                            <Border BorderThickness="1.5" BorderBrush="Black">
+                                <Button  Margin="2" Width="65" Height="65" HorizontalAlignment="Stretch " VerticalAlignment="Stretch" Command="{Binding DataContext.SelectPieceCommand, RelativeSource={RelativeSource AncestorType=Grid}}" CommandParameter="{Binding }" >
                                     <Button.Template>
                                         <ControlTemplate>
                                             <Border BorderThickness="1" BorderBrush="Black">
@@ -204,7 +200,7 @@
                 <Label Content="Black Castle Queen Side" Grid.Row="3" Grid.Column="3" VerticalAlignment="Center" FontSize="15"></Label>
                 <CheckBox Grid.Column="4" Grid.Row="3" VerticalAlignment="Center" IsChecked="{Binding BlackCastleQueenSide, Mode=TwoWay}" Margin="5"></CheckBox>
                 <Label Content= "Player Turn" Grid.Row="4" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="3" FontSize="15" ></Label>
-                <Button Content="Save Changes" FontSize="16"  Foreground="White" BorderBrush="WhiteSmoke" BorderThickness="4" Background="Black" Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Command="{Binding DataContext.SaveChangesCommand, RelativeSource={RelativeSource AncestorType=view:BoardView}}" Height="40" Margin="33,25,79,34" Width="140">
+                <Button Content="Save Changes" FontSize="16"  Grid.Row="5" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" Command="{Binding DataContext.SaveChangesCommand, RelativeSource={RelativeSource AncestorType=view:BoardView}}" Height="40" Margin="33,25,79,34" Width="140">
 
                 </Button>
 

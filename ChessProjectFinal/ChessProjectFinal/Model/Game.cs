@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Media;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
@@ -17,12 +16,12 @@ namespace ChessProjectFinal.Model
         #region CONSTRUCTOR
         public Game()
         {
-            WhitePlayer = PlayerType.HUMAN;
-            BlackPlayer = PlayerType.HUMAN;
-            playerSearches[Player.BLACK]= new NegaMaxSearchChess(new EvaluationFunction());
-            playerSearches[Player.WHITE] =new NegaMaxSearchChess(new EvaluationFunction());
+            PlayerSearches[Player.BLACK]= new NegaMaxSearchChess(new EvaluationFunction());
+            PlayerSearches[Player.WHITE] =new NegaMaxSearchChess(new EvaluationFunction());
             Board = new Board();
-            Start();
+            GameHistory = new GameHistory();
+            ReSync();
+            IsActive = false;
         }
         #endregion
         #region STATIC HELPER FUNCTIONS
@@ -41,7 +40,7 @@ namespace ChessProjectFinal.Model
         {
             return player == Player.WHITE ? 1 : 6;
         }
-        public static MediaPlayer SoundPlayer= new MediaPlayer();
+     
         
         #endregion
         #region PRIVATE BACKING FIELDS
@@ -53,10 +52,9 @@ namespace ChessProjectFinal.Model
 
      
         private readonly Dictionary<Player,PlayerType> playerTypes=new Dictionary<Player,PlayerType>(); 
-        private readonly Dictionary<Player,NegaMaxSearchChess> playerSearches=new Dictionary<Player,NegaMaxSearchChess>(); 
+        public readonly Dictionary<Player,NegaMaxSearchChess> PlayerSearches=new Dictionary<Player,NegaMaxSearchChess>(); 
         #endregion
         #region PROPERTIES 
-       
         public GameHistory GameHistory
         {
             get { return gameHistory; }
@@ -73,8 +71,33 @@ namespace ChessProjectFinal.Model
             }
 
         }
-        public bool IsActive { get { return isActive; } set { isActive = value; } }
+        public bool IsActive { get { return isActive; } set { isActive = value; RaisePropertyChanged(()=>IsActive);} }
         public bool IsBusy { get { return isBusy; } set { isBusy = value; RaisePropertyChanged(()=>IsBusy); } }
+        public PlayerType WhitePlayer
+        {
+            get { return playerTypes[Player.WHITE]; }
+
+            set
+            {
+                playerTypes[Player.WHITE]= value;
+                RaisePropertyChanged(() => WhitePlayer);
+            }
+        }
+        public PlayerType BlackPlayer
+        {
+            get { return playerTypes[Player.BLACK]; }
+
+            set
+            {
+                playerTypes[Player.BLACK] = value;
+                RaisePropertyChanged(() => BlackPlayer);
+            }
+        }
+        
+        #endregion
+        #region PRIVATE FIELDS
+
+
         #endregion
         #region PUBLIC METHODS
         public void MovePiece(ISquare targetSquare)
@@ -82,10 +105,12 @@ namespace ChessProjectFinal.Model
             var move = createMove(Board.SelectedSquare, targetSquare);
             GameHistory.MakeMove(move);
             ReSync();
+            movePieceSound();
+            
             Board.SelectedSquare = null;
             if (IsActive)
                new Thread(CheckAI).Start();
-            
+                
         }
        
         public void Start()
@@ -101,32 +126,11 @@ namespace ChessProjectFinal.Model
         public void EndGame()
         {
             IsActive = false;
-            var path = new Uri(Path.GetFullPath(@"..\..\Resources\VictorySound.wav"));
-            SoundPlayer.Open(path);
-            SoundPlayer.Play();
+            victorySound();
         }
 
-        public PlayerType WhitePlayer
-        {
-            get { return playerTypes[Player.WHITE]; }
+       
 
-            set
-            {
-                playerTypes.Add(Player.WHITE, value);
-                RaisePropertyChanged(() => WhitePlayer);
-            }
-        }
-
-        public PlayerType BlackPlayer
-        {
-            get { return playerTypes[Player.BLACK]; }
-
-            set
-            {
-                playerTypes[Player.BLACK] = value;
-                RaisePropertyChanged(() => BlackPlayer);
-            }
-        }
 
         #endregion
         #region PRIVATE METHODS
@@ -146,10 +150,8 @@ namespace ChessProjectFinal.Model
             {
                 Board.IndexedSquares[move.From].MoveSquares.Add(Board.IndexedSquares[move.To]);
             }
-            var path = new Uri(Path.GetFullPath(@"..\..\Resources\MoveSound.wav"));
-            SoundPlayer.Open(path);
-            SoundPlayer.Play();
-            if (BoardState.IsCheckMate(GameHistory.CurrentState, GameHistory.CurrentState.CurrentPlayer) ||BoardState.IsStaleMate(GameHistory.CurrentState,GameHistory.CurrentState.CurrentPlayer))
+          
+            if (BoardState.IsCheckMate(GameHistory.CurrentState, GameHistory.CurrentState.CurrentPlayer) || BoardState.IsStaleMate(GameHistory.CurrentState,GameHistory.CurrentState.CurrentPlayer))
                 EndGame();
         }
 
@@ -180,26 +182,54 @@ namespace ChessProjectFinal.Model
             return viewModel.PieceStruct;
         }
 
-     
+        private void movePieceSound()
+        {
+            new Thread(()=>
+            {
+                var path = new Uri(Path.GetFullPath(@"..\..\Resources\MoveSound.wav"));
+                var soundPlayer = new MediaPlayer();
+                soundPlayer.Open(path);
+                soundPlayer.Play();
+                Thread.Sleep(1000);
+            }
+                ).Start();
+        }
+        private void victorySound()
+        {
+            new Thread(() =>
+            {
+                var path = new Uri(Path.GetFullPath(@"..\..\Resources\VictorySound.wav"));
+                var soundPlayer = new MediaPlayer();
+                soundPlayer.Open(path);
+                soundPlayer.Play();
+                Thread.Sleep(1000);
+            }
+                ).Start();
+        }
 
-        
 
-       
-        
+
+
+
+
         public async void CheckAI()
         {
+            if (!IsActive) return;
             IsBusy = true;
             if (playerTypes[GameHistory.CurrentState.CurrentPlayer] != PlayerType.AI)
             {
                 IsBusy = false;
                 return;
-                
+
             }
-            var task = playerSearches[GameHistory.CurrentState.CurrentPlayer].Search(GameHistory.CurrentState.CurrentPlayer,GameHistory.CurrentState,6,1000000);
+            var task =
+                PlayerSearches[GameHistory.CurrentState.CurrentPlayer].Search(
+                    GameHistory.CurrentState.CurrentPlayer, GameHistory.CurrentState);
             GameHistory.MakeMove(await task);
             ReSync();
+            movePieceSound();
             IsBusy = false;
-           
+            CheckAI();
         }
             #endregion
 

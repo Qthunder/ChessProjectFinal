@@ -1,14 +1,16 @@
-﻿<Window
+﻿<controls:MetroWindow
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:view="clr-namespace:ChessProjectFinal.View"
         xmlns:viewModel="clr-namespace:ChessProjectFinal.ViewModel"
+        xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="ChessProjectFinal.MainWindow"
      Width="Auto"
     Height="Auto"
     ResizeMode="NoResize"
     WindowState="Normal"
     SizeToContent="WidthAndHeight" 
+    Title="Chess"
     >
     <Window.DataContext>
         <viewModel:MainViewModel/>
@@ -26,4 +28,4 @@
         </Grid.ColumnDefinitions>
         <view:BoardView DataContext="{Binding BoardViewModel}" Grid.Row="1" Grid.Column="1" />
     </Grid>
-</Window>
+</controls:MetroWindow>

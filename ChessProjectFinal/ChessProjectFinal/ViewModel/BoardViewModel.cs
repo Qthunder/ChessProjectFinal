@@ -27,6 +27,7 @@ namespace ChessProjectFinal.ViewModel
         private ICommand restartCommand;
         private ICommand saveChangesCommand;
         private DelegateCommand<Square> activatePieceCommand;
+        private ICommand newGameCommand;
         #endregion
         #region PUBLIC PROPERTIES
         public Boolean EditorMode
@@ -108,6 +109,16 @@ namespace ChessProjectFinal.ViewModel
                 return saveChangesCommand;
             }
         }
+
+        public ICommand NewGameCommand
+        {
+            get
+            {
+                if (newGameCommand == null)
+                    newGameCommand = new RelayCommand(newGame);
+                return newGameCommand;
+            }
+        }
         #endregion
         #region PRIVATE MTHODS
         private void saveChanges(object obj)
@@ -149,6 +160,17 @@ namespace ChessProjectFinal.ViewModel
             {
                 Game.MovePiece(targetSquare);
             }
+        }
+        private void newGame(object obj)
+        {
+            var viewModel = new NewGameViewModel();
+            if (viewModel.IsCanceled) return;
+            Game.WhitePlayer = viewModel.WhitePlayerType;
+            Game.BlackPlayer = viewModel.BlackPlayerType;
+            Game.PlayerSearches[Player.WHITE].NewSettings(viewModel.WhiteUsingPV, viewModel.WhiteDepth, viewModel.WhiteTime);
+            Game.PlayerSearches[Player.BLACK].NewSettings(viewModel.BlackUsingPV, viewModel.BlackDepth, viewModel.BlackTime);
+             
+            Game.Start();
         }
 
         private void changeEditMode(object obj)

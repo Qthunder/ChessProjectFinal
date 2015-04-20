@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using ChessProjectFinal.Model;
 
 namespace ChessProjectFinal.Entities
 {
@@ -7,7 +6,7 @@ namespace ChessProjectFinal.Entities
     {
         protected bool Equals(Move other)
         {
-            return Equals(Promotion, other.Promotion) && From.Equals(other.From) && To.Equals(other.To);
+            return Equals(Promotion, other.Promotion) && From.Equals(other.From) && To.Equals(other.To) && Equals(Piece, other.Piece) && Equals(CapturedPiece,other.CapturedPiece);
         }
 
         public override int GetHashCode()

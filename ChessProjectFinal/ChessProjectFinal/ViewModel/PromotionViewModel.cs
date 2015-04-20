@@ -54,7 +54,7 @@ namespace ChessProjectFinal.ViewModel
 
         public PromotionViewModel(Player player)
         {
-            
+            PieceStruct = Piece.PIECES[player][PieceType.QUEEN];
             var pieces = Piece.PIECES[player];
             var choices = new[]{pieces[PieceType.QUEEN], pieces[PieceType.ROOK], pieces[PieceType.BISHOP], pieces[PieceType.KNIGHT]};
             PromotionPieces= new ObservableCollection<Piece>(choices);

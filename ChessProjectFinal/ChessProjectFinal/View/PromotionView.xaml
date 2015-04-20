@@ -1,11 +1,13 @@
-﻿<Window x:Class="ChessProjectFinal.View.PromotionView"
+﻿<controls:MetroWindow x:Class="ChessProjectFinal.View.PromotionView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:view="clr-namespace:ChessProjectFinal.View"
         xmlns:converters="clr-namespace:ChessProjectFinal.Converters"
-        Title="PromotionView"
+        xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
+        Title="Promotion"
         Height="Auto"
         Width="Auto"
+        ShowCloseButton="False"
         ResizeMode="NoResize"
         SizeToContent="WidthAndHeight"
         >
@@ -27,7 +29,7 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate >
                 <DataTemplate>
-                    <Border BorderThickness="3" BorderBrush="DarkRed" >
+                    <Border BorderThickness="1" BorderBrush="Black"  Margin="20" >
                         <Button  Command="{Binding DataContext.ChoosePieceCommand, RelativeSource={RelativeSource AncestorType=view:PromotionView}}" CommandParameter="{Binding}">
                             <Button.Template>
                                 <ControlTemplate>
@@ -41,20 +43,4 @@
         </ItemsControl>
 
     </Border>
-   <!-- <Grid >
-        <Grid.RowDefinitions>
-            <RowDefinition></RowDefinition>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition></ColumnDefinition>
-            <ColumnDefinition></ColumnDefinition>
-            <ColumnDefinition></ColumnDefinition>
-            <ColumnDefinition></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-        <Button Content="KNIGHT"  Grid.Column="0" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Command="{Binding BishopCommand}"></Button>
-        <Button Content="BISHOP" Grid.Column="1" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Command="{Binding KnightCommand}"></Button>
-        <Button Content="ROOK"   Grid.Column="2" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Command="{Binding RookCommand}"></Button>
-        <Button Content="QUEEN"  Grid.Column="3" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Command="{Binding QueenCommand}"></Button>
-       
-    </Grid>-->
-</Window>
+  </controls:MetroWindow>

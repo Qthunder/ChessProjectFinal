@@ -42,11 +42,11 @@ namespace ChessProjectFinal.Model
             {
                 if (index == Player.WHITE)
                 {
-                    this.whitePlayer = value;
+                    whitePlayer = value;
                 }
                 else
                 {
-                    this.blackPlayer = value;
+                    blackPlayer = value;
                 }
             }
         }

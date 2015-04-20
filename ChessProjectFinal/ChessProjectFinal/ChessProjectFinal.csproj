@@ -49,12 +49,18 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MahApps.Metro">
+      <HintPath>..\packages\MahApps.Metro.1.1.2.0\lib\net45\MahApps.Metro.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable">
       <HintPath>..\packages\Microsoft.Bcl.Immutable.1.0.34\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.1.1.2.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -82,6 +88,7 @@
     <Compile Include="Converters\InvertedBoolToVisibilityConverter.cs" />
     <Compile Include="Converters\PieceToDisplayConverter.cs" />
     <Compile Include="Converters\PlayerToColorConverter.cs" />
+    <Compile Include="Converters\PlayerTypeToBoolConverter.cs" />
     <Compile Include="Converters\PointToColorConverter.cs" />
     <Compile Include="Model\Board.cs" />
     <Compile Include="Entities\BoardState.cs" />
@@ -102,9 +109,13 @@
     <Compile Include="ViewModel\BoardEditorViewModel.cs" />
     <Compile Include="ViewModel\BoardViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
+    <Compile Include="ViewModel\NewGameViewModel.cs" />
     <Compile Include="ViewModel\PromotionViewModel.cs" />
     <Compile Include="View\BoardView.xaml.cs">
       <DependentUpon>BoardView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\NewGameView.xaml.cs">
+      <DependentUpon>NewGameView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\PromotionView.xaml.cs">
       <DependentUpon>PromotionView.xaml</DependentUpon>
@@ -124,6 +135,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="View\BoardView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\NewGameView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

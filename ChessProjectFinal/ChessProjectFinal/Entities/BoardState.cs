@@ -47,6 +47,14 @@ namespace ChessProjectFinal.Model
             {
                 newState.PieceBoard[x2, y2] = move.Promotion;
             }
+            if (move.CapturedPiece!=null && move.CapturedPiece==Piece.PIECES[move.CapturedPiece.Player][PieceType.ROOK])
+            {   if (move.To.Y == 0)
+                    newState.CastleQueenSide[move.CapturedPiece.Player] = false;
+                if (move.To.Y==7)
+                    newState.CastleKingSide[move.CapturedPiece.Player] = false;
+                
+            }
+                
             if (move.Piece.PieceType == PieceType.KING)
             {
                 newState.CastleKingSide[move.Piece.Player] = false;
@@ -109,11 +117,11 @@ namespace ChessProjectFinal.Model
         }
         public static bool IsCheckMate(BoardState boardState,Player player )
         {
-            return GetValidMoves(boardState, player).Count == 0;
+            return GetValidMoves(boardState, player).Count == 0 && isCheck(boardState, player); 
         }
         public static bool IsStaleMate(BoardState boardState, Player player)
         {
-            return GetValidMoves(boardState, player).Count == 0 && isCheck(boardState, player);
+            return GetValidMoves(boardState, player).Count == 0;
         }
         private static List<Move> getMoves(BoardState boardState,Player player)
         {
@@ -179,15 +187,27 @@ namespace ChessProjectFinal.Model
 
                                 if ( i+direction<8 && i+direction>-1 && boardState.PieceBoard[i + direction, j] == null)
                                 {
-                                    moveList.Add(new Move(from, new Point(i + direction, j), piece, null));
+                                    if (i==7 -pawnRow)
+                                        moveList.AddRange(new[] {PieceType.ROOK, PieceType.QUEEN, PieceType.KNIGHT, PieceType.BISHOP}.Select(pieceType => new Move(@from, new Point(i + direction, j), piece, null, false, false, false, Piece.PIECES[piece.Player][pieceType])));
+                                    else    
+                                         moveList.Add(new Move(from, new Point(i + direction, j), piece, null));
                                     if (i == pawnRow && boardState.PieceBoard[i + direction * 2, j] == null)
                                         moveList.Add(new Move(from, new Point(i + direction * 2, j), piece, null));
                                 }
 
+                               
+
                                 if (i + direction < 8 && i + direction > -1 && j > 0 && boardState.PieceBoard[i + direction, j - 1] != null && boardState.PieceBoard[i + direction, j - 1].Player != piece.Player)
-                                    moveList.Add(new Move(from, new Point(i + direction, j - 1), piece, boardState.PieceBoard[i + direction, j - 1]));
+                                    if (i  == 7 - pawnRow)
+                                        moveList.AddRange(new[] {PieceType.ROOK, PieceType.QUEEN, PieceType.BISHOP, PieceType.KNIGHT,}.Select(pieceType => new Move(@from, new Point(i + direction, j - 1), piece, boardState.PieceBoard[i + direction, j - 1], false, false, false, Piece.PIECES[piece.Player][pieceType])));
+                                    else
+                                      moveList.Add(new Move(from, new Point(i + direction, j - 1), piece, boardState.PieceBoard[i + direction, j - 1]));
                                 if (i + direction < 8 && i + direction > -1 && j < 7 && boardState.PieceBoard[i + direction, j + 1] != null && boardState.PieceBoard[i + direction, j + 1].Player != piece.Player)
-                                    moveList.Add(new Move(from, new Point(i + direction, j + 1), piece, boardState.PieceBoard[i + direction, j + 1]));
+                                    if (i  == 7 - pawnRow)
+                                        moveList.AddRange(new[] {PieceType.ROOK, PieceType.QUEEN, PieceType.BISHOP, PieceType.KNIGHT,}.Select(pieceType => new Move(@from, new Point(i + direction, j + 1), piece, boardState.PieceBoard[i + direction, j + 1], false, false, false, Piece.PIECES[piece.Player][pieceType])));
+                                    else
+                                        moveList.Add(new Move(from, new Point(i + direction, j + 1), piece, boardState.PieceBoard[i + direction, j + 1]));
+
                                 break;
                             case PieceType.KNIGHT:
                                 var dir1 = new[] { 1, -1, 1, -1, 2, -2, 2, -2 };
