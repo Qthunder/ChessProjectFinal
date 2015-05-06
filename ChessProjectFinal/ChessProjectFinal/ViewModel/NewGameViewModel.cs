@@ -154,7 +154,7 @@ namespace ChessProjectFinal.ViewModel
             set
             {
                 blackUsingPV = value;
-                RaisePropertyChanged(() => blackUsingPV);
+                RaisePropertyChanged(() => BlackUsingPV);
             }
         }
         #endregion
@@ -167,6 +167,7 @@ namespace ChessProjectFinal.ViewModel
             WhiteDepth = 4;
             WhiteTime = 30;
             WhiteUsingPV = true;
+            BlackUsingPV = true;
             BlackPlayerType=PlayerType.HUMAN;
             BlackDepth = 4;
             BlackTime = 30;

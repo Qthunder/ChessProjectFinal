@@ -28,6 +28,8 @@ namespace ChessProjectFinal.ViewModel
         private ICommand saveChangesCommand;
         private DelegateCommand<Square> activatePieceCommand;
         private ICommand newGameCommand;
+        private ICommand stopCommand;
+
         #endregion
         #region PUBLIC PROPERTIES
         public Boolean EditorMode
@@ -57,7 +59,7 @@ namespace ChessProjectFinal.ViewModel
                 RaisePropertyChanged(() => Game);
             }
         }
-
+        
 #endregion
         #region COMMANDS
         public DelegateCommand<Square> ActivatePieceCommand
@@ -99,6 +101,19 @@ namespace ChessProjectFinal.ViewModel
                 return restartCommand;
             }
         }
+        public ICommand StopCommand
+        {
+
+            get
+            {
+                if (stopCommand == null)
+                    stopCommand = new RelayCommand(stop);
+                return stopCommand;
+            }
+        }
+
+       
+
         public ICommand SaveChangesCommand
         {
 
@@ -135,6 +150,10 @@ namespace ChessProjectFinal.ViewModel
         {
             restartGame();
         }
+        private void stop(object obj)
+        {
+           Game.ForceStopGame();
+        }
         private void activatePiece(ISquare targetSquare)
         {
             if (!Game.IsActive) return;
@@ -152,7 +171,7 @@ namespace ChessProjectFinal.ViewModel
         }
         private void restartGame()
         {
-            Game.Start();
+            Game.StartGame();
         }
         private void makeMove(Square targetSquare)
         {
@@ -170,7 +189,7 @@ namespace ChessProjectFinal.ViewModel
             Game.PlayerSearches[Player.WHITE].NewSettings(viewModel.WhiteUsingPV, viewModel.WhiteDepth, viewModel.WhiteTime);
             Game.PlayerSearches[Player.BLACK].NewSettings(viewModel.BlackUsingPV, viewModel.BlackDepth, viewModel.BlackTime);
              
-            Game.Start();
+            Game.StartGame();
         }
 
         private void changeEditMode(object obj)
@@ -179,7 +198,7 @@ namespace ChessProjectFinal.ViewModel
             {
                 EditorMode = false;
                 Game.ReSync();
-                Game.CheckAI();
+                Game.AI();
             }
             else
             {

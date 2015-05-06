@@ -1,8 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using ChessProjectFinal.Entities;
+﻿using System.Collections.Generic;
+using ChessProjectFinal.Model;
 
-namespace ChessProjectFinal.Model
+namespace ChessProjectFinal.Entities
 {
    public class GameHistory
     {
@@ -18,8 +17,8 @@ namespace ChessProjectFinal.Model
 
        public int Moves
        {
-           get { return this.moves; }
-           private set { this.moves = value; }
+           get { return moves; }
+           private set { moves = value; }
        }
 
        public void Undo()

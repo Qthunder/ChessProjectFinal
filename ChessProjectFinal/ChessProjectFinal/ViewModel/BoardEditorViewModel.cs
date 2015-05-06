@@ -166,7 +166,9 @@ namespace ChessProjectFinal.ViewModel
             var queenSide = new CastlingRights(whiteCastleQueenSide, blackCastleQueenSide);
             var kingSide = new CastlingRights(whiteCastleKingSide, blackCastleKingSide);
             var player = PlayerColor == Colors.Black ? Player.BLACK : Player.WHITE;
-            return new BoardState(board, false, new Point(0, 0), queenSide, kingSide, player);
+            var newState= new BoardState(board, false, new Point(0, 0), queenSide, kingSide, player,0);
+            newState.GetZobristKey();
+            return newState;
         }
         #endregion
 

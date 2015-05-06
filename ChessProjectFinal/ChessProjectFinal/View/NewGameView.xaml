@@ -65,9 +65,9 @@
         <TextBox  Width="50" Grid.Row="3" Grid.Column="3" IsEnabled="{Binding BlackPlayerType , Converter={StaticResource PlayerTypeToBoolConverter }}"  Text="{Binding BlackTime}"  ></TextBox>
   
          <Label   Content="Using Principle Variation" Grid.Row="0" Grid.Column="4"  FontSize="12" IsEnabled="{Binding WhitePlayerType , Converter={StaticResource PlayerTypeToBoolConverter }}" ></Label>
-        <CheckBox  Width="50" Grid.Row="0" Grid.Column="5" IsEnabled="{Binding WhitePlayerType , Converter={StaticResource PlayerTypeToBoolConverter }}"  IsChecked="{Binding WhiteUsingPrincipleVariation}" ></CheckBox>
+        <CheckBox  Width="50" Grid.Row="0" Grid.Column="5" IsEnabled="{Binding WhitePlayerType , Converter={StaticResource PlayerTypeToBoolConverter }}"  IsChecked="{Binding WhiteUsingPV}" ></CheckBox>
         <Label   Content="Using Principle Variation" Grid.Row="2" Grid.Column="4"  FontSize="12" IsEnabled="{Binding BlackPlayerType , Converter={StaticResource PlayerTypeToBoolConverter }}"></Label>
-        <CheckBox  Width="50" Grid.Row="2" Grid.Column="5" IsEnabled="{Binding BlackPlayerType , Converter={StaticResource PlayerTypeToBoolConverter }}"  IsChecked="{Binding BlackUsingPrincipleVariation}" ></CheckBox>
+        <CheckBox  Width="50" Grid.Row="2" Grid.Column="5" IsEnabled="{Binding BlackPlayerType , Converter={StaticResource PlayerTypeToBoolConverter }}"  IsChecked="{Binding BlackUsingPV}" ></CheckBox>
 
     
     </Grid>

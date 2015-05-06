@@ -10,7 +10,7 @@
             
              >
 
-    <UserControl.Resources>
+   <UserControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"></converters:BoolToVisibilityConverter>
         <converters:PointToColorConverter x:Key="PointToColorConverter"></converters:PointToColorConverter>
         <converters:HideOnNullConverter x:Key="HideOnNullConverter"></converters:HideOnNullConverter>
@@ -27,6 +27,7 @@
             <MenuItem Header="Game">
                 <MenuItem Header="New Game" Command="{Binding NewGameCommand}"></MenuItem>
                 <MenuItem Header="Restart" Command="{Binding RestartCommand}"></MenuItem>
+                <MenuItem Header="Stop Game" Command="{Binding StopCommand}"></MenuItem>
                 <MenuItem Header="Edit Mode" IsCheckable="True" Command="{Binding EditModeCommand}"  IsEnabled="{Binding Game.IsBusy,Converter={StaticResource InvertBooleanConverter}}"  ></MenuItem>
                 <MenuItem Header="Settings"></MenuItem>
             </MenuItem>
@@ -40,9 +41,46 @@
             <Grid.RowDefinitions>
                 <RowDefinition></RowDefinition>
                 <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
-            <Border BorderBrush="Black" BorderThickness="5" Grid.Column="1">
-                <ItemsControl ItemsSource="{Binding Game.Board.Squares}" IsHitTestVisible="{Binding Game.IsBusy, Converter={StaticResource InvertBooleanConverter}}">
+            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Vertical">
+                <StackPanel.Resources>
+                    <Style TargetType="Label">
+                        <Setter Property="Margin" Value="3,22,3,22"></Setter>
+                        <Setter Property="FontSize" Value="14px"></Setter>
+                        <Setter Property="FontWeight" Value="Bold"></Setter>
+                        <Setter Property="HorizontalAlignment" Value="Center"></Setter>
+                    </Style>
+                </StackPanel.Resources>
+                <Label Content="8" ></Label>
+                <Label Content="7" ></Label>
+                <Label Content="6" ></Label>
+                <Label Content="5" ></Label>
+                <Label Content="4" ></Label>
+                <Label Content="3" ></Label>
+                <Label Content="2" ></Label>
+                <Label Content="1" ></Label>
+            </StackPanel>
+            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal">
+                <StackPanel.Resources>
+                    <Style TargetType="Label">
+                        <Setter Property="Margin" Value="28,0,28,0"></Setter>
+                        <Setter Property="FontSize" Value="14px"></Setter>
+                        <Setter Property="FontWeight" Value="Bold"></Setter>
+                        <Setter Property="VerticalAlignment" Value="Center"></Setter>
+                    </Style>
+                </StackPanel.Resources>
+                <Label Content="A" ></Label>
+                <Label Content="B" ></Label>
+                <Label Content="C" ></Label>
+                <Label Content="D" ></Label>
+                <Label Content="E" ></Label>
+                <Label Content="F" ></Label>
+                <Label Content="G" ></Label>
+                <Label Content="H" ></Label>
+            </StackPanel>
+            <Border BorderBrush="Black" BorderThickness="5" Grid.Row="0" Grid.Column="1">
+               <ItemsControl ItemsSource="{Binding Game.Board.Squares}" IsHitTestVisible="{Binding Game.IsBusy, Converter={StaticResource InvertBooleanConverter}}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Grid >
@@ -74,7 +112,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate >
-                            <Border BorderThickness="2" BorderBrush="#B3ADAD"  Width="73" Height="73" >
+                            <Border BorderThickness="2" BorderBrush="#B3ADAD"  Width="73px" Height="73px" >
                                 <Grid>
                                     <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity="1.0" Fill="{Binding Coords,Converter={StaticResource PointToColorConverter}}" Visibility="Visible" IsHitTestVisible="False"></Rectangle>
                                     <Rectangle HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity="1.0" Fill="#C7DFF6" Visibility="{Binding IsValidMove,Converter={StaticResource BoolToVisibilityConverter}}" IsHitTestVisible="False"/>
@@ -216,7 +254,11 @@
                     </Button.Template>
                 </Button>
             </Grid>
-        </Grid >
+          
+                 <Label Grid.Row="2" Grid.Column="1" VerticalAlignment="Center"  HorizontalAlignment="Left" Content="{Binding Game.WhiteSearch.PV}"></Label>
+                 <Label Grid.Row="2" Grid.Column="1"  VerticalAlignment="Center"  HorizontalAlignment="Right" Content="{Binding Game.BlackSearch.PV}"></Label>
+           
+            </Grid >
     </DockPanel>
 
 </UserControl>

@@ -4,6 +4,60 @@ namespace ChessProjectFinal.Entities
 {
     public class Move :IMove
     {
+        public override string ToString()
+        {
+            if (IsKingSideCastle)
+                return "0-0";
+            if (IsQueenSideCastle)
+                return "0-0-0";
+            var s = "";
+            switch (Piece.PieceType)
+            {
+                    case PieceType.PAWN:
+                    if (capturedPiece != null)
+                        s += From;
+                    break;
+                    case PieceType.BISHOP:
+                        s += "B";
+                    break;
+                    case PieceType.KNIGHT:
+                        s += "N";
+                    break;
+                    case PieceType.ROOK:
+                         s += "R";
+                    break;
+                    case PieceType.QUEEN:
+                         s += "Q";
+                    break;
+                    case PieceType.KING:
+                    s += "K";
+                    break;
+            }
+            if (capturedPiece != null)
+                s += "x";
+            s += (char) (((int) (To.Y)) + 97);
+            s += ((int) To.X + 1);
+            if (Promotion!=null)
+                switch (Promotion.PieceType)
+                {
+                    case PieceType.PAWN:
+                        break;
+                    case PieceType.BISHOP:
+                        s += "B";
+                        break;
+                    case PieceType.KNIGHT:
+                        s += "N";
+                        break;
+                    case PieceType.ROOK:
+                        s += "R";
+                        break;
+                    case PieceType.QUEEN:
+                        s += "Q";
+                        break;
+                }
+            return s;
+        }
+
         protected bool Equals(Move other)
         {
             return Equals(Promotion, other.Promotion) && From.Equals(other.From) && To.Equals(other.To) && Equals(Piece, other.Piece) && Equals(CapturedPiece,other.CapturedPiece);

@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
-using ChessProjectFinal.Entities;
+using ChessProjectFinal.Model;
 
-namespace ChessProjectFinal.Model
+namespace ChessProjectFinal.Entities
 {
     public class BoardState
     {
+
+       
         public static BoardState DefaultBoard()
         {
             var pieceBoard = new Piece[8, 8];
@@ -29,14 +31,19 @@ namespace ChessProjectFinal.Model
 
             }
 
-            
-            return new BoardState(pieceBoard, false, new Point(0,0), new CastlingRights(true, true),new CastlingRights(true,true), Player.WHITE);
-            
-          
+           
+           
+               
+            var newBoardState=new BoardState(pieceBoard, false, new Point(0,0), new CastlingRights(true, true),new CastlingRights(true,true), Player.WHITE,0);
+            newBoardState.GetZobristKey();
+            return newBoardState;
+
+
         }
         public static BoardState DoMove(BoardState boardState,IMove move)
         {
             var newState=new BoardState(boardState);
+            UInt64 zobristKey = zobristCastlingRights(boardState);
             var x = (int)move.From.X;
             var y = (int)move.From.Y;
             var x2 = (int)move.To.X;
@@ -89,6 +96,19 @@ namespace ChessProjectFinal.Model
                 newState.PieceBoard[baseRow, 3] = Piece.PIECES[move.Piece.Player][PieceType.ROOK];
             }
             newState.CurrentPlayer = Game.OTHER_PLAYER(boardState.CurrentPlayer);
+           
+
+            zobristKey = boardState.ZobristKey ^
+                         ZobristKeys.Pieces[(int) move.Piece.PieceType, (int) move.Piece.Player, (int) move.From.X, (int) move.From.Y];
+            zobristKey ^=ZobristKeys.Pieces[(int) move.Piece.PieceType, (int) move.Piece.Player, (int) move.To.X, (int) move.To.Y];
+            if (move.CapturedPiece != null)
+                zobristKey ^=
+                    ZobristKeys.Pieces[(int) move.CapturedPiece.PieceType, (int) move.CapturedPiece.Player, (int) move.To.X,(int) move.To.Y];
+            zobristKey ^= zobristCastlingRights(newState);
+            if (boardState.EnPassant)
+                zobristKey ^=ZobristKeys.EnPassant[(int) boardState.EnPassantSquare.X, (int) boardState.EnPassantSquare.Y];
+            if (move.IsEnPassant)
+                 zobristKey ^=ZobristKeys.EnPassant[(int) newState.EnPassantSquare.X, (int) newState.EnPassantSquare.Y];
             return newState;
         }
         public static IReadOnlyList<Move> GetValidMoves(BoardState boardState,Player player)
@@ -298,10 +318,29 @@ namespace ChessProjectFinal.Model
         public bool EnPassant;
         public Point EnPassantSquare;
         public CastlingRights CastleQueenSide = new CastlingRights(false,false);
-        public CastlingRights CastleKingSide = new CastlingRights(false,false);
+        public CastlingRights CastleKingSide =  new CastlingRights(false,false);
         public Player CurrentPlayer;
+        public UInt64 ZobristKey;
 
 
+        public void GetZobristKey()
+        {
+            UInt64 zobristKey = 0;
+            for (var i = 0; i < 8; i++)
+                for (var j = 0; j < 8; j++)
+                {
+                    var piece = PieceBoard[i, j];
+                    if (piece!=null)
+                        zobristKey ^= ZobristKeys.Pieces[(int)piece.PieceType, (int)piece.Player, i, j];
+                }
+
+
+            zobristKey ^= zobristCastlingRights(this);
+            if (EnPassant)
+                zobristKey ^= ZobristKeys.EnPassant[(int)EnPassantSquare.X, (int) EnPassantSquare.Y];
+            ZobristKey = zobristKey;
+
+        }
         public override bool Equals(object obj)
         {
             if (!(obj is BoardState))
@@ -315,8 +354,20 @@ namespace ChessProjectFinal.Model
                    CurrentPlayer == other.CurrentPlayer;
         }
 
-      
-        public BoardState(Piece[,] pieceBoard,bool enPassant,Point enPassantSquare,CastlingRights castleQueenSide, CastlingRights castleKingSide,Player player)
+        private static UInt64 zobristCastlingRights(BoardState boardState)
+        {
+            UInt64 zobristKey = 0;
+            var whiteCastlingQ = boardState.CastleQueenSide[Player.WHITE] ? 1 : 0;
+            var whiteCastlingK = boardState.CastleKingSide[Player.WHITE] ? 1 : 0;
+            var blackCastlingQ = boardState.CastleQueenSide[Player.WHITE] ? 1 : 0;
+            var blackCastlingK = boardState.CastleKingSide[Player.WHITE] ? 1 : 0; 
+            zobristKey ^= ZobristKeys.BCastlingRights[blackCastlingK*2+blackCastlingQ];
+            zobristKey ^= ZobristKeys.WCastlingRights[whiteCastlingK*2+whiteCastlingQ];
+            return zobristKey;
+
+        }
+
+        public BoardState(Piece[,] pieceBoard,bool enPassant,Point enPassantSquare,CastlingRights castleQueenSide, CastlingRights castleKingSide,Player player,UInt64 zobristKey)
         {
             CurrentPlayer = player;
             PieceBoard = (Piece[,])pieceBoard.Clone();
@@ -324,8 +375,10 @@ namespace ChessProjectFinal.Model
             EnPassantSquare = enPassantSquare;
             CastleKingSide = castleKingSide;
             CastleQueenSide = castleQueenSide;
+            ZobristKey = zobristKey;
+
         }
-        public BoardState(BoardState that) : this(that.PieceBoard, that.EnPassant, that.EnPassantSquare, that.CastleQueenSide,that.CastleKingSide, that.CurrentPlayer)
+        public BoardState(BoardState that) : this(that.PieceBoard, that.EnPassant, that.EnPassantSquare, that.CastleQueenSide,that.CastleKingSide, that.CurrentPlayer,that.ZobristKey)
         {
            
         }

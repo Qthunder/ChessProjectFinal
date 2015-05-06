@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using ChessProjectFinal.ChessSearch;
@@ -55,6 +56,15 @@ namespace ChessProjectFinal.Model
         public readonly Dictionary<Player,NegaMaxSearchChess> PlayerSearches=new Dictionary<Player,NegaMaxSearchChess>(); 
         #endregion
         #region PROPERTIES 
+
+        public NegaMaxSearchChess WhiteSearch
+        {
+            get { return PlayerSearches[Player.WHITE]; }
+        }
+        public NegaMaxSearchChess BlackSearch
+        {
+            get { return PlayerSearches[Player.BLACK]; }
+        }
         public GameHistory GameHistory
         {
             get { return gameHistory; }
@@ -97,6 +107,8 @@ namespace ChessProjectFinal.Model
         #endregion
         #region PRIVATE FIELDS
 
+        private CancellationTokenSource stopGameCancellationTokenSource=new CancellationTokenSource();
+        private Task workTask = Task.Factory.StartNew(() => { });
 
         #endregion
         #region PUBLIC METHODS
@@ -106,27 +118,41 @@ namespace ChessProjectFinal.Model
             GameHistory.MakeMove(move);
             ReSync();
             movePieceSound();
-            
             Board.SelectedSquare = null;
-            if (IsActive)
-               new Thread(CheckAI).Start();
-                
+            AI();
         }
        
-        public void Start()
+        public void StartGame()
         {
-            
+            if (IsActive)
+                StopGame();
+            IsActive = true;
             GameHistory = new GameHistory();
             IsActive = true;
             ReSync();
-            new Thread(CheckAI).Start(); 
+            AI();
 
+
+        }
+
+        public void ForceStopGame()
+        {
+            stopGameCancellationTokenSource.Cancel();
+            workTask.Wait();
+            StopGame();
+        }
+
+        public void StopGame()
+        {
+            stopGameCancellationTokenSource=new CancellationTokenSource();
+            IsActive = false;
         }
 
         public void EndGame()
         {
-            IsActive = false;
+            stopGameCancellationTokenSource.Cancel();
             victorySound();
+            StopGame();
         }
 
        
@@ -212,7 +238,7 @@ namespace ChessProjectFinal.Model
 
 
 
-        public async void CheckAI()
+     /*   public async void AI()
         {
             if (!IsActive) return;
             IsBusy = true;
@@ -225,13 +251,45 @@ namespace ChessProjectFinal.Model
             var task =
                 PlayerSearches[GameHistory.CurrentState.CurrentPlayer].Search(
                     GameHistory.CurrentState.CurrentPlayer, GameHistory.CurrentState);
+           
             GameHistory.MakeMove(await task);
             ReSync();
             movePieceSound();
             IsBusy = false;
-            CheckAI();
+        }*/
+
+        public void AI()
+        {
+            IsBusy = true;
+            var token = stopGameCancellationTokenSource.Token;
+            workTask = new Task(() => aiWork(token), token);
+            workTask.Start();
+            workTask.ContinueWith(task => { IsBusy = false; });
+            
         }
-            #endregion
+
+        private void aiWork(CancellationToken token)
+        {
+
+
+            while (playerTypes[GameHistory.CurrentState.CurrentPlayer] == PlayerType.AI)
+            {
+               
+                
+                var move =PlayerSearches[GameHistory.CurrentState.CurrentPlayer].Search(GameHistory.CurrentState.CurrentPlayer, GameHistory.CurrentState);
+                if (token.IsCancellationRequested)
+                    return;
+                if (move != null)
+                {
+                    GameHistory.MakeMove(move);
+                }
+               
+                ReSync();
+                movePieceSound();
+            }
+        }
+
+        #endregion
 
 
     }

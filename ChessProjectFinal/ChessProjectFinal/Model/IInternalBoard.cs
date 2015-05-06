@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿/*
+using System.Collections.Generic;
 using ChessProjectFinal.Entities;
 
 namespace ChessProjectFinal.Model
@@ -12,3 +13,4 @@ namespace ChessProjectFinal.Model
         void RestoreState(BoardState boardState);
     }
 }
+*/
